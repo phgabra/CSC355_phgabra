@@ -1,0 +1,49 @@
+// Set up system variables
+int window_width = 500;
+int window_height = 500;
+int window_x = 300;
+int window_y = 200;
+string window_title = "gpl Lab1";
+int animation_speed = 20; // 1 is slowest, 100 is fastest
+
+circle player(radius = 25);
+
+forward animation rainbow(rectangle cur_rectangle);
+
+rectangle square(x = 225, y = 225, w = 50, h = 50, red = 1, animation_block = rainbow);
+
+animation rainbow (rectangle cur_rectangle) {
+
+    if (cur_rectangle.red == 1) {
+        cur_rectangle.red = 0;
+        cur_rectangle.green = 1;
+    }
+    else if (cur_rectangle.green == 1) {
+        cur_rectangle.green = 0;
+        cur_rectangle.blue = 1;
+    }
+    else if (cur_rectangle.blue == 1) {
+        cur_rectangle.blue = 0;
+        cur_rectangle.red = 1;
+    }
+}
+
+on leftarrow
+{
+    player.x -= 10;
+}
+
+on rightarrow
+{
+    player.x += 10;
+}
+
+on uparrow
+{
+    player.y += 10;
+}
+
+on downarrow
+{
+    player.y -= 10;
+}
