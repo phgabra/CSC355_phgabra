@@ -1,0 +1,184 @@
+int window_width = 500;
+int window_height = 500;
+string window_title = "Drench";
+int animation_speed = 50;
+
+int grid_size = 10;
+int cell_size = 40;
+int colors = 6;
+int moves = 0;
+int game_over = 0;
+int current_color = 0;
+int i;
+int row;
+int col;
+int new_color;
+int changed;
+int old_color;
+int trigger_flood_fill = 0;  // A flag to indicate when to run flood fill
+
+rectangle grid[100];
+int grid_colors[100];
+
+textbox move_counter(x = 10, y = window_height - 30, text = "Moves: 0");
+textbox game_over_text(x = window_width/2 - 50, y = window_height - 30, text = "", size = 0.2);
+textbox color_indicator(x = 10, y = window_height - 60, text = "Current Color: Red", size = 0.1);
+
+forward animation flood_fill(rectangle cur_cell);
+
+initialization {
+    for (i = 0; i < 100; i += 1) {
+        row = i / 10;
+        col = i % 10;
+        
+        grid[i].w = cell_size;
+        grid[i].h = cell_size;
+        grid[i].x = col * cell_size;
+        grid[i].y = row * cell_size;
+        
+        grid_colors[i] = random(colors);
+        
+        if (grid_colors[i] == 0) {
+            grid[i].red = 1.0;
+            grid[i].green = 0.0;
+            grid[i].blue = 0.0;
+        } else if (grid_colors[i] == 1) {
+            grid[i].red = 0.0;
+            grid[i].green = 1.0;
+            grid[i].blue = 0.0;
+        } else if (grid_colors[i] == 2) {
+            grid[i].red = 0.0;
+            grid[i].green = 0.0;
+            grid[i].blue = 1.0;
+        } else if (grid_colors[i] == 3) {
+            grid[i].red = 1.0;
+            grid[i].green = 1.0;
+            grid[i].blue = 0.0;
+        } else if (grid_colors[i] == 4) {
+            grid[i].red = 1.0;
+            grid[i].green = 0.0;
+            grid[i].blue = 1.0;
+        } else {
+            grid[i].red = 0.0;
+            grid[i].green = 1.0;
+            grid[i].blue = 1.0;
+        }
+        
+        grid[i].animation_block = flood_fill;
+    }
+}
+
+animation flood_fill(rectangle cur_cell) {
+    if (game_over == 0 && trigger_flood_fill == 1) {
+        new_color = current_color;
+        old_color = grid_colors[0];  // Color of the top-left cell
+        changed = 0;
+        
+        if (new_color != old_color) {
+            for (i = 0; i < 100; i += 1) {
+                if (grid_colors[i] == old_color) {
+                    if (i == 0 ||
+                        (i % 10 > 0 && grid_colors[i-1] == new_color) ||
+                        (i / 10 > 0 && grid_colors[i-10] == new_color)) {
+                        
+                        changed = 1;
+                        grid_colors[i] = new_color;
+                        
+                        if (new_color == 0) {
+                            grid[i].red = 1.0;
+                            grid[i].green = 0.0;
+                            grid[i].blue = 0.0;
+                        } else if (new_color == 1) {
+                            grid[i].red = 0.0;
+                            grid[i].green = 1.0;
+                            grid[i].blue = 0.0;
+                        } else if (new_color == 2) {
+                            grid[i].red = 0.0;
+                            grid[i].green = 0.0;
+                            grid[i].blue = 1.0;
+                        } else if (new_color == 3) {
+                            grid[i].red = 1.0;
+                            grid[i].green = 1.0;
+                            grid[i].blue = 0.0;
+                        } else if (new_color == 4) {
+                            grid[i].red = 1.0;
+                            grid[i].green = 0.0;
+                            grid[i].blue = 1.0;
+                        } else {
+                            grid[i].red = 0.0;
+                            grid[i].green = 1.0;
+                            grid[i].blue = 1.0;
+                        }
+                    }
+                }
+            }
+            
+            if (changed == 1) {
+                moves += 1;
+                move_counter.text = "Moves: " + moves;
+            }
+        }
+        
+        // Check if all cells are the same color
+        game_over = 1;
+        for (i = 1; i < 100; i += 1) {
+            if (grid_colors[i] != grid_colors[0]) {
+                game_over = 0;
+                i = 100; // break the loop
+            }
+        }
+        
+        if (game_over == 1) {
+            game_over_text.text = "You Win!";
+        }
+        
+        // Reset trigger after the flood fill is done
+        trigger_flood_fill = 0;
+    }
+}
+
+on leftarrow {
+    if (game_over == 0) {
+        current_color = (current_color - 1 + colors) % colors;
+        // Update the color indicator
+        if (current_color == 0) {
+            color_indicator.text = "Current Color: Red";
+        } else if (current_color == 1) {
+            color_indicator.text = "Current Color: Green";
+        } else if (current_color == 2) {
+            color_indicator.text = "Current Color: Blue";
+        } else if (current_color == 3) {
+            color_indicator.text = "Current Color: Yellow";
+        } else if (current_color == 4) {
+            color_indicator.text = "Current Color: Magenta";
+        } else {
+            color_indicator.text = "Current Color: Cyan";
+        }
+    }
+}
+
+on rightarrow {
+    if (game_over == 0) {
+        current_color = (current_color + 1) % colors;
+        // Update the color indicator
+        if (current_color == 0) {
+            color_indicator.text = "Current Color: Red";
+        } else if (current_color == 1) {
+            color_indicator.text = "Current Color: Green";
+        } else if (current_color == 2) {
+            color_indicator.text = "Current Color: Blue";
+        } else if (current_color == 3) {
+            color_indicator.text = "Current Color: Yellow";
+        } else if (current_color == 4) {
+            color_indicator.text = "Current Color: Magenta";
+        } else {
+            color_indicator.text = "Current Color: Cyan";
+        }
+    }
+}
+
+on space {
+    if (game_over == 0) {
+        trigger_flood_fill = 1;  // Trigger the flood fill
+    }
+}
