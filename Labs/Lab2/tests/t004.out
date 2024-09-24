@@ -1,43 +1,22 @@
-<T_KEYWORD, 'int'>
-<T_IDENTIFIER, 'main'>
-<T_DELIMITER, '('>
-<T_DELIMITER, ')'>
-<T_DELIMITER, '{'>
-<T_KEYWORD, 'string'>
-<T_IDENTIFIER, 'str'>
-<T_OPERATOR, '='>
-<T_STRING_LIT, '"hello, world!"'>
-<T_DELIMITER, ';'>
-<T_KEYWORD, 'int'>
-<T_IDENTIFIER, 'index'>
-<T_OPERATOR, '='>
-<T_NUMBER, '0'>
-<T_DELIMITER, ';'>
-<T_KEYWORD, 'while'>
-<T_DELIMITER, '('>
-<T_IDENTIFIER, 'index'>
-<T_OPERATOR, '<'>
-<T_NUMBER, '13'>
-<T_DELIMITER, ')'>
-<T_DELIMITER, '{'>
-<T_KEYWORD, 'printf'>
-<T_DELIMITER, '('>
-<T_STRING_LIT, '"%c\n"'>
-<T_DELIMITER, ','>
-<T_IDENTIFIER, 'str'>
-<T_DELIMITER, '['>
-<T_IDENTIFIER, 'index'>
-<T_DELIMITER, ']'>
-<T_DELIMITER, ')'>
-<T_DELIMITER, ';'>
-<T_IDENTIFIER, 'index'>
-<T_OPERATOR, '='>
-<T_IDENTIFIER, 'index'>
-<T_OPERATOR, '+'>
-<T_NUMBER, '1'>
-<T_DELIMITER, ';'>
-<T_DELIMITER, '}'>
-<T_KEYWORD, 'return'>
-<T_NUMBER, '0'>
-<T_DELIMITER, ';'>
-<T_DELIMITER, '}'>
+parser.cpp::main() reading file tests/t004.in
+parser.cpp::main() about to call yyparse()
+type zero or more record declarations followed by ^D:
+
+------------------------------------------------------
+record Doubles
+{
+
+  x = 1.12 (double)
+  y = 0.12 (double)
+  z = 42 (double)
+
+} 3 fields were declared.
+
+1 record was declared.
+------------------------------------------------------
+
+parser.cpp::main() after call to yyparse()
+
+no errors found by yyparse()
+
+parser.cpp::main() end of program.

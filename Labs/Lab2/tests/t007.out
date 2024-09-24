@@ -1,16 +1,20 @@
-<T_KEYWORD, 'int'>
-<T_IDENTIFIER, 'main'>
-<T_DELIMITER, '('>
-<T_DELIMITER, ')'>
-<T_DELIMITER, '{'>
-<T_KEYWORD, 'int'>
-Input: 1abc is UNKNOWN
-<T_OPERATOR, '='>
-<T_NUMBER, '1'>
-<T_DELIMITER, ';'>
-<T_KEYWORD, 'int'>
-<T_IDENTIFIER, 'abc1'>
-<T_OPERATOR, '='>
-<T_NUMBER, '1'>
-<T_DELIMITER, ';'>
-<T_DELIMITER, '}'>
+parser.cpp::main() reading file tests/t007.in
+parser.cpp::main() about to call yyparse()
+type zero or more record declarations followed by ^D:
+
+------------------------------------------------------
+record MakeSureYourQuotedStringsCanContainAnyCharacters
+{
+
+  password = '! @ # $ % ^ & * ( ) _ + ' (string)
+
+} 1 field was declared.
+
+1 record was declared.
+------------------------------------------------------
+
+parser.cpp::main() after call to yyparse()
+
+no errors found by yyparse()
+
+parser.cpp::main() end of program.

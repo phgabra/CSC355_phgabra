@@ -13,6 +13,9 @@ C++OBJ = $(C++SRC:%.cpp=%.o)
 parser: y.tab.o lex.yy.o $(C++OBJ)
 	$(CXX) -g -o parser y.tab.o lex.yy.o $(C++OBJ) $(LIBDIRS) $(LIBS)
 
+y.tab.c y.tab.h: record.y parser.h error.h
+	bison -vyd record.y
+
 y.tab.o: y.tab.c 
 	$(CXX) $(CPPFLAGS) -c y.tab.c
 
@@ -24,9 +27,10 @@ lex.yy.o: lex.yy.c y.tab.h
 
 
 clean:
-	rm -f $(C++OBJ) parser lex.yy.c lex.yy.o y.tab.o
+	rm -f $(C++OBJ) parser lex.yy.c lex.yy.o \
+	y.output y.tab.h y.tab.c y.tab.o 
 
 
 # dependencies
 error.o: error.cpp error.h
-parser.o: parser.h error.h
+parser.o: parser.h record.y error.h

@@ -1,20 +1,22 @@
-<T_KEYWORD, 'int'>
-<T_IDENTIFIER, 'a'>
-<T_OPERATOR, '='>
-<T_NUMBER, '1'>
-<T_DELIMITER, ';'>
-<T_KEYWORD, 'int'>
-<T_IDENTIFIER, 'b'>
-<T_OPERATOR, '='>
-<T_NUMBER, '1000000'>
-<T_DELIMITER, ';'>
-<T_KEYWORD, 'float'>
-<T_IDENTIFIER, 'c'>
-<T_OPERATOR, '='>
-<T_NUMBER, '1.0'>
-<T_DELIMITER, ';'>
-<T_KEYWORD, 'float'>
-<T_IDENTIFIER, 'd'>
-<T_OPERATOR, '='>
-<T_NUMBER, '1.1'>
-<T_DELIMITER, ';'>
+parser.cpp::main() reading file tests/t001.in
+parser.cpp::main() about to call yyparse()
+type zero or more record declarations followed by ^D:
+
+------------------------------------------------------
+record George
+{
+
+  height = 68 (int)
+  age = 42 (int)
+  weight = 175 (int)
+
+} 3 fields were declared.
+
+1 record was declared.
+------------------------------------------------------
+
+parser.cpp::main() after call to yyparse()
+
+no errors found by yyparse()
+
+parser.cpp::main() end of program.

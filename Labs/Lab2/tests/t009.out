@@ -1,86 +1,20 @@
-<T_KEYWORD, 'int'>
-<T_IDENTIFIER, 'main'>
-<T_DELIMITER, '('>
-<T_DELIMITER, ')'>
-<T_DELIMITER, '{'>
-<T_KEYWORD, 'int'>
-<T_IDENTIFIER, 'a'>
-<T_OPERATOR, '='>
-<T_NUMBER, '10'>
-<T_DELIMITER, ';'>
-<T_KEYWORD, 'float'>
-<T_IDENTIFIER, 'b'>
-<T_OPERATOR, '='>
-<T_NUMBER, '20.5'>
-<T_DELIMITER, ';'>
-<T_KEYWORD, 'char'>
-<T_IDENTIFIER, 'c'>
-<T_OPERATOR, '='>
-<T_CHAR_LIT, ''x''>
-<T_DELIMITER, ';'>
-<T_KEYWORD, 'string'>
-<T_IDENTIFIER, 'str'>
-<T_OPERATOR, '='>
-<T_STRING_LIT, '"Test string"'>
-<T_DELIMITER, ';'>
-<T_KEYWORD, 'if'>
-<T_DELIMITER, '('>
-<T_IDENTIFIER, 'a'>
-<T_OPERATOR, '<'>
-<T_IDENTIFIER, 'b'>
-<T_DELIMITER, ')'>
-<T_DELIMITER, '{'>
-<T_IDENTIFIER, 'a'>
-<T_OPERATOR, '='>
-<T_IDENTIFIER, 'a'>
-<T_OPERATOR, '+'>
-<T_NUMBER, '1'>
-<T_DELIMITER, ';'>
-<T_DELIMITER, '}'>
-<T_KEYWORD, 'else'>
-<T_DELIMITER, '{'>
-<T_IDENTIFIER, 'b'>
-<T_OPERATOR, '='>
-<T_IDENTIFIER, 'b'>
-<T_OPERATOR, '-'>
-<T_NUMBER, '1'>
-<T_DELIMITER, ';'>
-<T_DELIMITER, '}'>
-<T_KEYWORD, 'while'>
-<T_DELIMITER, '('>
-<T_IDENTIFIER, 'a'>
-<T_OPERATOR, '<'>
-<T_NUMBER, '20'>
-<T_DELIMITER, ')'>
-<T_DELIMITER, '{'>
-<T_IDENTIFIER, 'a'>
-<T_OPERATOR, '+'>
-<T_OPERATOR, '+'>
-<T_DELIMITER, ';'>
-<T_DELIMITER, '}'>
-<T_IDENTIFIER, 'for'>
-<T_DELIMITER, '('>
-<T_KEYWORD, 'int'>
-<T_IDENTIFIER, 'i'>
-<T_OPERATOR, '='>
-<T_NUMBER, '0'>
-<T_DELIMITER, ';'>
-<T_IDENTIFIER, 'i'>
-<T_OPERATOR, '<'>
-<T_NUMBER, '10'>
-<T_DELIMITER, ';'>
-<T_IDENTIFIER, 'i'>
-<T_OPERATOR, '+'>
-<T_OPERATOR, '+'>
-<T_DELIMITER, ')'>
-<T_DELIMITER, '{'>
-<T_IDENTIFIER, 'a'>
-<T_OPERATOR, '+'>
-<T_OPERATOR, '='>
-<T_IDENTIFIER, 'i'>
-<T_DELIMITER, ';'>
-<T_DELIMITER, '}'>
-<T_KEYWORD, 'return'>
-<T_NUMBER, '0'>
-<T_DELIMITER, ';'>
-<T_DELIMITER, '}'>
+parser.cpp::main() reading file tests/t009.in
+parser.cpp::main() about to call yyparse()
+type zero or more record declarations followed by ^D:
+
+------------------------------------------------------
+record modify_T_ID_so_it_can_contain_underscores
+{
+
+  one = 1 (int)
+
+} 1 field was declared.
+
+1 record was declared.
+------------------------------------------------------
+
+parser.cpp::main() after call to yyparse()
+
+no errors found by yyparse()
+
+parser.cpp::main() end of program.

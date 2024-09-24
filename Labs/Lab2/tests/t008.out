@@ -1,42 +1,42 @@
-<T_KEYWORD, 'int'>
-<T_IDENTIFIER, 'a'>
-<T_OPERATOR, '='>
-<T_NUMBER, '123'>
-<T_DELIMITER, ';'>
-<T_KEYWORD, 'float'>
-<T_IDENTIFIER, 'b'>
-<T_OPERATOR, '='>
-<T_NUMBER, '4.56'>
-<T_DELIMITER, ';'>
-<T_KEYWORD, 'char'>
-<T_IDENTIFIER, 'c'>
-<T_OPERATOR, '='>
-<T_CHAR_LIT, ''7''>
-<T_DELIMITER, ';'>
-<T_KEYWORD, 'int'>
-<T_IDENTIFIER, 'x'>
-<T_OPERATOR, '='>
-<T_NUMBER, '5'>
-<T_OPERATOR, '+'>
-<T_NUMBER, '10'>
-<T_DELIMITER, ';'>
-<T_IDENTIFIER, 'x'>
-<T_OPERATOR, '='>
-<T_IDENTIFIER, 'x'>
-<T_OPERATOR, '*'>
-<T_NUMBER, '3'>
-<T_OPERATOR, '/'>
-<T_NUMBER, '2'>
-<T_OPERATOR, '-'>
-<T_NUMBER, '1'>
-<T_DELIMITER, ';'>
-<T_KEYWORD, 'char'>
-<T_IDENTIFIER, 'ch'>
-<T_OPERATOR, '='>
-<T_CHAR_LIT, ''a''>
-<T_DELIMITER, ';'>
-<T_KEYWORD, 'string'>
-<T_IDENTIFIER, 'str'>
-<T_OPERATOR, '='>
-<T_STRING_LIT, '"Hello, World!"'>
-<T_DELIMITER, ';'>
+parser.cpp::main() reading file tests/t008.in
+parser.cpp::main() about to call yyparse()
+type zero or more record declarations followed by ^D:
+
+------------------------------------------------------
+record George
+{
+
+  name = 'George Washington' (string)
+  birthday = FEB 22, 1732 (date)
+  height = 68.2 (double)
+  age = 42.5 (double)
+  weight = 175.42 (double)
+
+} 5 fields were declared.
+
+record dates
+{
+
+  a = JAN 1, 2001 (date)
+  b = FEB 2, 2002 (date)
+  c = MAR 3, 2003 (date)
+  d = APR 4, 2004 (date)
+  e = MAY 5, 2005 (date)
+  f = JUN 6, 2006 (date)
+  g = JUL 7, 2007 (date)
+  h = AUG 8, 2008 (date)
+  i = SEP 9, 2009 (date)
+  j = OCT 10, 2010 (date)
+  k = NOV 11, 2011 (date)
+  l = DEC 12, 2012 (date)
+
+} 12 fields were declared.
+
+2 records were declared.
+------------------------------------------------------
+
+parser.cpp::main() after call to yyparse()
+
+no errors found by yyparse()
+
+parser.cpp::main() end of program.
