@@ -101,19 +101,17 @@ The right-hand-side (RHS) specifies an action (code to execute) when
 [\n]            line_count++; // count the lines for error reporting
 [ \t\r]         ; // ignore spaces, tabs and the microsoft line feed (\r)
 
-"record"                          return T_RECORD;
-"="                               return T_ASSIGN;
-"{"                               return T_LBRACE;
-"}"                               return T_RBRACE;
-";"                               return T_SEMIC;
-","                               return T_COMMA;
-[A-Z]{3}                          return T_MONTH;
+"record"                                          return T_RECORD;
+"="                                               return T_ASSIGN;
+"{"                                               return T_LBRACE;
+"}"                                               return T_RBRACE;
+";"                                               return T_SEMIC;
+","                                               return T_COMMA;
 
+JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC   get_string_value(); return T_MONTH;
+[0-9]+                                            get_int_value(); return T_INT_CONSTANT;
+[A-Za-z_]([A-Za-z_]|[0-9])*                       get_string_value(); return T_ID;
+([0-9]+(\.[0-9]*)?)|(\.[0-9]+)                    get_double_value(); return T_DOUBLE_CONSTANT;
+\"[^"]*\"                                         get_quoted_string_value(); return T_STRING_CONSTANT;
 
-[0-9]+                            get_int_value(); return T_INT_CONSTANT;
-[A-Za-z_]([A-Za-z_]|[0-9])*       get_string_value(); return T_ID;
-([0-9]+(\.[0-9]*)?)|(\.[0-9]+)    get_double_value(); return T_DOUBLE_CONSTANT;
-\"[^"]*\"                         get_quoted_string_value(); return T_STRING_CONSTANT;
-
-
-.                                 error(); return T_ERROR;
+.                                                 error(); return T_ERROR;
