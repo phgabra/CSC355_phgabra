@@ -12,11 +12,11 @@ using namespace std;
 
 // DFA States
 enum State {
-    A,  // Start state
-    B,  // State after 1 'a'
-    C,  // State after 2 'a's
-    D,  // State after 'ab'
-    E,  // State after 'abb'
+    A,
+    B,
+    C,
+    D,
+    E,
     ERROR  // Error state
 };
 
@@ -26,7 +26,7 @@ enum State {
  *  @return true if the current state is an accepting state. false, otherwise.
  */
 bool isAcceptingState(State currentState) {
-    return currentState == B || currentState == C || currentState == E;
+    return currentState == B || currentState == D || currentState == E;
 }
 
 /*  Convert enum State type to string.
@@ -56,19 +56,21 @@ State transition(State currentState, char symbol) {
     switch (currentState) {
         case A:
             if (symbol == 'a') return B;
+            if (symbol == 'b') return C;
             break;
         case B:
-            if (symbol == 'a') return C;
-            if (symbol == 'b') return D;
-            break;
-        case C:
-            return ERROR;  // No valid transitions from C
-        case D:
+            if (symbol == 'a') return D;
             if (symbol == 'b') return E;
             break;
-        case E:
+        case C:
+            if (symbol == 'a') return D;
+            if (symbol == 'b') return D;
+        case D:
             return ERROR;  // No valid transitions from E
-    }
+        case E:
+            if (symbol == 'a') return D;
+            if (symbol == 'b') return D;    
+        }
     return ERROR;
 }
 
