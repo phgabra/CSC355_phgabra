@@ -33,7 +33,7 @@ PHASE := $(notdir $(CURDIR))
 #   GRAPHICS turns on graphics for p6-p8
 # P5 P6 P7 P8 are used by my private code so I can use the same file for 
 #   multiple phases.  You may use them if you want.
-ifeq ($(PHASE),p3)
+ifeq ($(PHASE),P3)
   MACRO_DEFINITIONS = -DP3
 else ifeq ($(PHASE),p4)
   MACRO_DEFINITIONS = -DSYMBOL_TABLE -DP4
