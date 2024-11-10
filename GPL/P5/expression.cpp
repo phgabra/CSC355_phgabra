@@ -10,21 +10,48 @@ using namespace std;
 
 Expression::Expression(int value)
 {
-    // COMPLETE ME
+    m_type = INT;
+    m_constant = new Constant(value);
+    m_variable = nullptr;
+    m_lhs = nullptr;
+    m_rhs = nullptr;
+    m_op = NO_OP;
 }
+
 Expression::Expression(double value)
 {
-    // COMPLETE ME
+    m_type = DOUBLE;
+    m_constant = new Constant(value);
+    m_variable = nullptr;
+    m_lhs = nullptr;
+    m_rhs = nullptr;
+    m_op = NO_OP;
 }
 
 Expression::Expression(string *value)
 {
-    // COMPLETE ME
+    m_type = STRING;
+    m_constant = new Constant(*value);
+    m_variable = nullptr;
+    m_lhs = nullptr;
+    m_rhs = nullptr;
+    m_op = NO_OP;
 }
 
 Expression::Expression(Variable *variable)
 {
-    // COMPLETE ME
+    if (variable == nullptr) {
+        m_type = INT;  // Default to INT if variable is null
+        m_variable = nullptr;
+    } else {
+        m_type = variable->get_type();
+        m_variable = variable;
+    }
+
+    m_constant = nullptr;
+    m_lhs = nullptr;
+    m_rhs = nullptr;
+    m_op = NO_OP;
 }
 
 Expression::Expression(Operator_type op,
@@ -32,7 +59,24 @@ Expression::Expression(Operator_type op,
                        Expression *rhs
                        )
 {
-    // COMPLETE ME
+    m_op = op;
+    m_lhs = lhs;
+    m_rhs = rhs;
+    m_constant = nullptr;
+    m_variable = nullptr;
+
+    // Determine m_type based on lhs and rhs types and operation
+    if (lhs->m_type == STRING || rhs->m_type == STRING) {
+        if (op == PLUS) {
+            m_type = STRING; // Concatenation
+        } else {
+            m_type = INT; // Comparison operations like ==, !=, <, etc.
+        }
+    } else if (lhs->m_type == DOUBLE || rhs->m_type == DOUBLE) {
+        m_type = DOUBLE;
+    } else {
+        m_type = INT;
+    }
 }
 
 Expression::Expression(Operator_type op, Expression *operand)
