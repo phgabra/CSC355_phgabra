@@ -63,42 +63,52 @@ string Variable::get_string_value() const
 
 void Variable::set(int value)
 {
+    // Ensure this Variable is of type INT or INT_ARRAY
     if (m_symbol->get_type() == INT || m_symbol->get_type() == INT_ARRAY) {
         if (m_expression) {
-            m_symbol->get_int_value(eval_index_with_error_checking()) = value;
+            // For array elements, set the value at the evaluated index
+            m_symbol->set_int_value(value, eval_index_with_error_checking());
         } else {
-            *static_cast<int*>(m_symbol->m_data_void_ptr) = value;
+            // For simple variables, set the integer value directly
+            m_symbol->set_int_value(value);
         }
     } else {
-        Error::error(Error::TYPE_MISMATCH, m_symbol->get_name(), "int");
+        Error::error(Error::ASSIGNMENT_TYPE_ERROR, m_symbol->get_name(), "int");
     }
 }
 
 void Variable::set(double value)
 {
+    // Ensure this Variable is of type DOUBLE or DOUBLE_ARRAY
     if (m_symbol->get_type() == DOUBLE || m_symbol->get_type() == DOUBLE_ARRAY) {
         if (m_expression) {
-            m_symbol->get_double_value(eval_index_with_error_checking()) = value;
+            // For array elements, set the value at the evaluated index
+            m_symbol->set_double_value(value, eval_index_with_error_checking());
         } else {
-            *static_cast<double*>(m_symbol->m_data_void_ptr) = value;
+            // For simple variables, set the double value directly
+            m_symbol->set_double_value(value);
         }
     } else {
-        Error::error(Error::TYPE_MISMATCH, m_symbol->get_name(), "double");
+        Error::error(Error::ASSIGNMENT_TYPE_ERROR, m_symbol->get_name(), "double");
     }
 }
 
 void Variable::set(string value)
 {
+    // Ensure this Variable is of type STRING or STRING_ARRAY
     if (m_symbol->get_type() == STRING || m_symbol->get_type() == STRING_ARRAY) {
         if (m_expression) {
-            m_symbol->get_string_value(eval_index_with_error_checking()) = value;
+            // For array elements, set the value at the evaluated index
+            m_symbol->set_string_value(value, eval_index_with_error_checking());
         } else {
-            *static_cast<string*>(m_symbol->m_data_void_ptr) = value;
+            // For simple variables, set the string value directly
+            m_symbol->set_string_value(value);
         }
     } else {
-        Error::error(Error::TYPE_MISMATCH, m_symbol->get_name(), "string");
+        Error::error(Error::ASSIGNMENT_TYPE_ERROR, m_symbol->get_name(), "string");
     }
 }
+
 
 // Evaluate expression if there is one, return index if index is out of bounds, 
 // issue error, return 0 (0 is always in bounds)

@@ -1,0 +1,2 @@
+Semantic error on line 6: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 7: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'double''.

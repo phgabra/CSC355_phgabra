@@ -1,0 +1,86 @@
+Semantic error on line 5: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 8: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 9: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 10: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 11: Invalid left operand for operator '%'.
+Semantic error on line 11: Invalid right operand for operator '%'.
+Semantic error on line 11: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'string''.
+Semantic error on line 13: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 14: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 15: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 16: Invalid left operand for operator '%'.
+Semantic error on line 16: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'string''.
+Semantic error on line 18: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 19: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 20: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 21: Invalid left operand for operator '%'.
+Semantic error on line 21: Invalid right operand for operator '%'.
+Semantic error on line 21: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'string''.
+Semantic error on line 23: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 24: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 25: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 26: Invalid right operand for operator '%'.
+Semantic error on line 26: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'string''.
+Semantic error on line 28: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 29: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 30: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
+Semantic error on line 31: Invalid left operand for operator '%'.
+Semantic error on line 31: Invalid right operand for operator '%'.
+Semantic error on line 31: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'string''.
+Semantic error on line 34: Invalid right operand for operator '-'.
+Semantic error on line 34: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'string''.
+Semantic error on line 35: Invalid right operand for operator '*'.
+Semantic error on line 35: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'string''.
+Semantic error on line 36: Invalid right operand for operator '/'.
+Semantic error on line 36: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'string''.
+Semantic error on line 37: Invalid right operand for operator '%'.
+Semantic error on line 37: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'string''.
+Semantic error on line 39: Invalid right operand for operator '-'.
+Semantic error on line 39: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'string''.
+Semantic error on line 40: Invalid right operand for operator '*'.
+Semantic error on line 40: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'string''.
+Semantic error on line 41: Invalid right operand for operator '/'.
+Semantic error on line 41: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'string''.
+Semantic error on line 42: Invalid left operand for operator '%'.
+Semantic error on line 42: Invalid right operand for operator '%'.
+Semantic error on line 42: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'string''.
+Semantic error on line 44: Variable 's1' was not declared before it was used.
+Semantic error on line 44: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 45: Variable 's1' was not declared before it was used.
+Semantic error on line 45: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 46: Variable 's1' was not declared before it was used.
+Semantic error on line 46: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 47: Variable 's1' was not declared before it was used.
+Semantic error on line 47: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 48: Variable 's1' was not declared before it was used.
+Semantic error on line 48: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 49: Variable 's1' was not declared before it was used.
+Semantic error on line 49: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 50: Variable 's1' was not declared before it was used.
+Semantic error on line 50: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 51: Variable 's1' was not declared before it was used.
+Semantic error on line 51: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 52: Variable 's1' was not declared before it was used.
+Semantic error on line 52: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 53: Variable 's1' was not declared before it was used.
+Semantic error on line 53: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 55: Invalid right operand for operator 'cos'.
+Semantic error on line 55: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 56: Invalid right operand for operator 'sin'.
+Semantic error on line 56: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 57: Invalid right operand for operator 'tan'.
+Semantic error on line 57: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 58: Invalid right operand for operator 'acos'.
+Semantic error on line 58: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 59: Invalid right operand for operator 'asin'.
+Semantic error on line 59: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 60: Invalid right operand for operator 'atan'.
+Semantic error on line 60: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 61: Invalid right operand for operator 'sqrt'.
+Semantic error on line 61: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 62: Invalid right operand for operator 'abs'.
+Semantic error on line 62: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 63: Invalid right operand for operator 'floor'.
+Semantic error on line 63: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 64: Invalid right operand for operator 'random'.
+Semantic error on line 64: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.

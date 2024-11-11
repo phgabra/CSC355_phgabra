@@ -1,0 +1,2 @@
+Semantic error on line 3: Variable 'not_an_array' is not an array.
+assertion "m_lhs" failed: file "expression.cpp", line 132.  Input line 3.

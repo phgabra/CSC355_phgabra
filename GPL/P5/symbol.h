@@ -21,6 +21,15 @@ class Symbol
     Symbol(std::string name, int initial_value);
     Symbol(std::string name, double initial_value);
     Symbol(std::string name, std::string initial_value);
+
+    // Setter for int values
+    void set_int_value(int value, int index = UNDEFINED_INDEX);
+
+    // Setter for double values
+    void set_double_value(double value, int index = UNDEFINED_INDEX);
+
+    // Setter for string values
+    void set_string_value(const std::string &value, int index = UNDEFINED_INDEX);
   
     // array: int, double, string, circle, rectangle, triangle, textbox, pixmap
     Symbol(std::string name, Gpl_type type, int size);

@@ -30,6 +30,37 @@ Symbol::Symbol(string name, string initial_value)
   validate();
 }
 
+void Symbol::set_int_value(int value, int index)
+{
+    validate_type_and_index(INT, index);
+    if (is_array()) {
+        ((int*)m_data_void_ptr)[index] = value;
+    } else {
+        *((int*)m_data_void_ptr) = value;
+    }
+}
+
+void Symbol::set_double_value(double value, int index)
+{
+    validate_type_and_index(DOUBLE, index);
+    if (is_array()) {
+        ((double*)m_data_void_ptr)[index] = value;
+    } else {
+        *((double*)m_data_void_ptr) = value;
+    }
+}
+
+void Symbol::set_string_value(const std::string &value, int index)
+{
+    validate_type_and_index(STRING, index);
+    if (is_array()) {
+        ((std::string*)m_data_void_ptr)[index] = value;
+    } else {
+        *((std::string*)m_data_void_ptr) = value;
+    }
+}
+
+
 
 Symbol::Symbol(string name, Gpl_type type, int size)
 {

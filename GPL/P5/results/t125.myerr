@@ -1,0 +1,2 @@
+Semantic error on line 3: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'double' to a variable of type 'int''.
+assertion "m_rhs" failed: file "expression.cpp", line 291.  Input line 7.

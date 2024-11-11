@@ -65,23 +65,47 @@ Expression::Expression(Operator_type op,
     m_constant = nullptr;
     m_variable = nullptr;
 
-    // Determine m_type based on lhs and rhs types and operation
-    if (lhs->m_type == STRING || rhs->m_type == STRING) {
-        if (op == PLUS) {
-            m_type = STRING; // Concatenation
-        } else {
-            m_type = INT; // Comparison operations like ==, !=, <, etc.
-        }
-    } else if (lhs->m_type == DOUBLE || rhs->m_type == DOUBLE) {
-        m_type = DOUBLE;
-    } else {
-        m_type = INT;
+    if(op == PLUS || op == MINUS || op == MULTIPLY || op == DIVIDE){
+      if(lhs->m_type == DOUBLE || rhs->m_type == DOUBLE ){
+        m_type == DOUBLE;
+      }
+      else{
+        m_type == INT;
+
+      }
     }
+    else if(op == AND || op == OR || op == EQUAL || op == NOT_EQUAL || op == LESS_EQUAL || op == LESS_THAN || op == GREATER_THAN ||  op == GREATER_EQUAL || op == MOD){
+      m_type == INT;
+  }
 }
 
 Expression::Expression(Operator_type op, Expression *operand)
 {
-    // COMPLETE ME
+    m_lhs = operand;   
+    m_op = op; 
+    switch(op){
+      case SIN:
+      case COS:
+      case TAN:
+      case ATAN:
+      case ACOS:
+      case ASIN:
+      case SQRT:
+        m_type = DOUBLE;
+        break;
+      case FLOOR:
+      case RANDOM:
+        m_type = INT;
+        break;
+      case ABS:
+      case UNARY_MINUS:
+        m_type = operand -> m_type;
+        break;
+      default:
+        assert(false && "Unkonwn operator");
+    }
+
+    m_type = operand->get_type(); 
 }
 
 

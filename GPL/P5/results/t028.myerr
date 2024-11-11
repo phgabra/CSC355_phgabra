@@ -1,0 +1,2 @@
+Semantic error on line 3: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'string''.
+assertion "false && "Unkonwn operator"" failed: file "expression.cpp", line 105.  Input line 4.

@@ -1,0 +1,9 @@
+Semantic error on line 8: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'double''.
+Semantic error on line 9: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'double''.
+Semantic error on line 10: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'double''.
+Semantic error on line 16: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'double''.
+Semantic error on line 17: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'double''.
+Semantic error on line 18: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'double''.
+Semantic error on line 22: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+Semantic error on line 23: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'int' to a variable of type 'double''.
+assertion "m_rhs" failed: file "expression.cpp", line 291.  Input line 25.
