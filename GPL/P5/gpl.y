@@ -8,10 +8,8 @@
 #include "gpl_assert.h"
 #include "symbol_table.h"
 #include "symbol.h"
-#include "gpl_type.h"
 #include "expression.h"
 #include "variable.h"
-#include "constant.h"
 #include <iostream>
 #include <sstream>
 #include <cmath> // for floor()
@@ -23,17 +21,17 @@ extern int yyerror(const char *);
 extern int line_count;  // from gpl.l, used for statement blocks
 
 int undeclared = 0;
-Symbol_table *symbol_table = Symbol_table::instance();
 
 %}
 
 %union {
-  int                           union_int;
-  double                        union_double;
-  std::string                   *union_string;  // MUST be a pointer to a string ARG!
-  int                           gpl_type;
-  Expression                    *union_expression;
-  Variable                      *union_variable;
+  int              union_int;
+  double           union_double;
+  std::string      *union_string;  // MUST be a pointer to a string ARG!
+  Expression       *union_expression;
+  Variable         *union_variable;
+  int              gpl_type;
+  int              math_operator_type;
 }
 
 %error-verbose
@@ -153,14 +151,14 @@ Symbol_table *symbol_table = Symbol_table::instance();
 %nonassoc UNARY_OPS
 
 %type <gpl_type> simple_type
-%type <gpl_type> math_operator
 %type <union_expression> expression
 %type <union_expression> primary_expression
 %type <union_expression> optional_initializer
 %type <union_variable> variable
+%type <union_variable> variable_declaration
+%type <math_operator_type> math_operator
 
 %%
-
 
 //---------------------------------------------------------------------
 program:
@@ -169,79 +167,164 @@ program:
 
 //---------------------------------------------------------------------
 declaration_list:
-    declaration_list declaration
+    declaration_list declaration T_SEMIC
     | empty
     ;
 
 //---------------------------------------------------------------------
 declaration:
-    variable_declaration T_SEMIC
-    | object_declaration T_SEMIC
-    | forward_declaration T_SEMIC
+    simple_type T_ID optional_initializer
+    {
+        std::string var_name = *$2;
+        delete $2;
+
+        Symbol *new_symbol = nullptr;
+
+        // Create a default symbol based on the declared type
+        if ($1 == T_INT) {
+            new_symbol = new Symbol(var_name, 0);
+        } else if ($1 == T_DOUBLE) {
+            new_symbol = new Symbol(var_name, 0.0);
+        } else {
+            new_symbol = new Symbol(var_name, "");
+        }
+
+        // Attempt to insert the symbol into the symbol table
+        if (!Symbol_table::instance()->insert(new_symbol)) {
+            Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, var_name);
+            delete new_symbol;
+        } else if ($3) {
+            Gpl_type initializer_type = $3->get_type();
+
+            // Check for type mismatches or array issues
+            if (initializer_type == INT_ARRAY || initializer_type == DOUBLE_ARRAY || initializer_type == STRING_ARRAY) {
+                Error::error(Error::VARIABLE_IS_AN_ARRAY, $3->get_variable()->get_name());
+            } else if ($1 == T_INT && initializer_type != INT) {
+                Error::error(Error::INVALID_TYPE_FOR_INITIAL_VALUE, gpl_type_to_string(initializer_type), var_name, "int");
+            } else if ($1 == T_DOUBLE && initializer_type != DOUBLE && initializer_type != INT) {
+                Error::error(Error::INVALID_TYPE_FOR_INITIAL_VALUE, gpl_type_to_string(initializer_type), var_name, "double");
+            } else if ($1 == T_STRING && initializer_type != STRING && initializer_type != INT && initializer_type != DOUBLE) {
+                Error::error(Error::ASSIGNMENT_TYPE_ERROR, var_name, gpl_type_to_string(initializer_type));
+            } else {
+                if ($1 == T_INT) {
+                    new_symbol->set_value($3->eval_int());
+                } else if ($1 == T_DOUBLE) {
+                    new_symbol->set_value($3->eval_double());
+                } else {
+                    new_symbol->set_value($3->eval_string());
+                }
+            }
+
+            delete $3; // Clean up
+        }
+    }
+    | simple_type T_ID T_LBRACKET expression T_RBRACKET
+    {
+        Symbol_table *sym_table = Symbol_table::instance();
+        std::string array_name = *$2;
+        Gpl_type expr_type = $4->get_type();
+
+        // Check if the size expression is valid
+        if (expr_type != INT) {
+            Error::error(Error::ARRAY_SIZE_MUST_BE_AN_INTEGER, gpl_type_to_string(expr_type), array_name);
+            delete $2;
+            delete $4;
+        } else {
+            int array_size = $4->eval_int();
+            delete $2;
+            delete $4;
+
+            if (array_size < 1) {
+                Error::error(Error::INVALID_ARRAY_SIZE, array_name, std::to_string(array_size));
+            } else {
+                Symbol *new_symbol = ($1 == T_INT) ? new Symbol(array_name, INT_ARRAY, array_size)
+                                  : ($1 == T_DOUBLE) ? new Symbol(array_name, DOUBLE_ARRAY, array_size)
+                                  : new Symbol(array_name, STRING_ARRAY, array_size);
+
+                // Insert the array symbol into the symbol table
+                if (!sym_table->insert(new_symbol)) {
+                    Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, array_name);
+                    delete new_symbol;
+                }
+            }
+        }
+    }
+    | object_declaration
+    | forward_declaration
     ;
 
 //---------------------------------------------------------------------
 variable_declaration:
     simple_type T_ID optional_initializer
     {
+        Symbol_table *sym_table = Symbol_table::instance();
         std::string var_name = *$2;
-        int declared_type = $1;
-        Symbol *new_symbol = nullptr;
+        int type = $1;
+        Variable *new_variable = nullptr;
 
-        if ($3) {
-            Expression *initializer_expr = $3;
-            int initializer_type = initializer_expr->get_type();
-
-            // Ensure initializer type matches the declared variable type
-            if (initializer_type != declared_type) {
-                std::string declared_type_str = gpl_type_to_string(static_cast<Gpl_type>(declared_type));
-                std::string initializer_type_str = gpl_type_to_string(static_cast<Gpl_type>(initializer_type));
-
-                Error::error(Error::ASSIGNMENT_TYPE_ERROR, "Cannot assign an expression of type '" 
-                             + initializer_type_str + "' to a variable of type '" + declared_type_str + "'");
-                
-                // Use default value for recovery based on declared type
-                if (declared_type == INT) {
-                    new_symbol = new Symbol(var_name, 0);
-                } else if (declared_type == DOUBLE) {
-                    new_symbol = new Symbol(var_name, 0.0);
-                } else if (declared_type == STRING) {
-                    new_symbol = new Symbol(var_name, std::string(""));
-                }
-            } else {
-                // Initialize with evaluated value based on the matching type
-                if (declared_type == INT) {
-                    new_symbol = new Symbol(var_name, initializer_expr->eval_int());
-                } else if (declared_type == DOUBLE) {
-                    new_symbol = new Symbol(var_name, initializer_expr->eval_double());
-                } else if (declared_type == STRING) {
-                    new_symbol = new Symbol(var_name, initializer_expr->eval_string());
-                }
+        if ($3 != nullptr) {
+            // Initialize the variable with the provided initializer
+            if (type == T_INT) {
+                new_variable = new Variable(var_name, $3->eval_int());
+            } else if (type == T_DOUBLE) {
+                new_variable = new Variable(var_name, $3->eval_double());
+            } else if (type == T_STRING) {
+                new_variable = new Variable(var_name, $3->eval_string());
             }
         } else {
-            // No initializer provided; assign default value based on type
-            if (declared_type == INT) {
-                new_symbol = new Symbol(var_name, 0);
-            } else if (declared_type == DOUBLE) {
-                new_symbol = new Symbol(var_name, 0.0);
-            } else if (declared_type == STRING) {
-                new_symbol = new Symbol(var_name, std::string(""));
-            }
+            // Default initialization for the variable
+            new_variable = (type == T_INT) ? new Variable(var_name, 0)
+                         : (type == T_DOUBLE) ? new Variable(var_name, 0.0)
+                         : new Variable(var_name, "");
         }
 
-        // Insert the symbol into the symbol table and handle re-declaration error
-        if (new_symbol && !symbol_table->insert(new_symbol)) {
+        // Attempt to insert the variable into the symbol table
+        if (!sym_table->insert(new_variable)) {
             Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, var_name);
-            delete new_symbol;
+            delete new_variable;
+            $$ = nullptr;
+        } else {
+            $$ = new_variable;
+        }
+
+        // Clean up
+        delete $2;
+        delete $3;
+    }
+    | simple_type T_ID T_LBRACKET expression T_RBRACKET
+    {
+        Symbol_table *sym_table = Symbol_table::instance();
+        std::string array_name = *$2;
+        int array_size = $4->eval_int();
+
+        // Clean up
+        delete $2;
+        delete $4;
+
+        if (array_size < 1) {
+            // Handle invalid array size
+            Error::error(Error::INVALID_ARRAY_SIZE, array_name, std::to_string(array_size));
+            $$ = nullptr;
+        } else {
+            // Create and insert the array variable
+            Variable *new_variable = new Variable(array_name, array_size);
+
+            if (!sym_table->insert(new_variable)) {
+                Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, array_name);
+                delete new_variable;
+                $$ = nullptr;
+            } else {
+                $$ = new_variable;
+            }
         }
     }
     ;
 
 //---------------------------------------------------------------------
 simple_type:
-    T_INT { $$ = INT; }
-    | T_DOUBLE { $$ = DOUBLE; }
-    | T_STRING { $$ = STRING; }
+    T_INT { $$ = T_INT; }
+    | T_DOUBLE { $$ = T_DOUBLE; }
+    | T_STRING { $$ = T_STRING; }
     ;
 
 //---------------------------------------------------------------------
@@ -254,7 +337,7 @@ optional_initializer:
     {
         $$ = nullptr;
     }
-    ;
+
 //---------------------------------------------------------------------
 object_declaration:
     object_type T_ID T_LPAREN parameter_list_or_empty T_RPAREN
@@ -362,7 +445,7 @@ keystroke:
     | T_LKEY
     | T_WKEY
     | T_ZKEY
-  ;
+    ;
 
 //---------------------------------------------------------------------
 if_block:
@@ -395,14 +478,14 @@ statement_list:
 statement:
     if_statement
     | for_statement
+    | assign_statement T_SEMIC
     | print_statement T_SEMIC
     | exit_statement T_SEMIC
-    | assign_statement_or_empty T_SEMIC
     ;
 
 //---------------------------------------------------------------------
 if_statement:
-    T_IF T_LPAREN expression T_RPAREN if_block
+    T_IF T_LPAREN expression T_RPAREN if_block %prec IF_NO_ELSE
     | T_IF T_LPAREN expression T_RPAREN if_block T_ELSE if_block
     ;
 
@@ -435,182 +518,193 @@ assign_statement:
     | variable T_PLUS_PLUS
     | variable T_MINUS_MINUS
     ;
-
 //---------------------------------------------------------------------
 variable:
-    T_ID
+    T_ID 
     {
         Symbol *sym = Symbol_table::instance()->lookup(*$1);
+
         if (!sym) {
             Error::error(Error::UNDECLARED_VARIABLE, *$1);
             $$ = nullptr;
         } else if (sym->is_array()) {
-            // Error if trying to use an array without indexing
             Error::error(Error::VARIABLE_IS_AN_ARRAY, *$1);
             $$ = nullptr;
         } else {
-            $$ = new Variable(sym);  // Regular variable handling
+            $$ = new Variable(sym);
         }
+
         delete $1;
     }
     | T_ID T_LBRACKET expression T_RBRACKET
     {
         Symbol *sym = Symbol_table::instance()->lookup(*$1);
+
         if (!sym) {
-            Error::error(Error::UNDECLARED_VARIABLE, *$1+"[]");
+            Error::error(Error::UNDECLARED_VARIABLE, *$1 + "[]");
             $$ = nullptr;
         } else if (!sym->is_array()) {
-            // Error if trying to index a non-array variable
             Error::error(Error::VARIABLE_NOT_AN_ARRAY, *$1);
             $$ = nullptr;
         } else {
             Gpl_type index_type = $3->get_type();
 
-            // Check if the index expression is not an integer
             if (index_type != INT) {
-                // Error: non-integer type used as array index
-                Error::error(Error::ARRAY_INDEX_MUST_BE_AN_INTEGER, *$1, "A " + gpl_type_to_string(index_type) + " expression");
+                Error::error(
+                    Error::ARRAY_INDEX_MUST_BE_AN_INTEGER,
+                    *$1,
+                    "A " + gpl_type_to_string(index_type) + " expression"
+                );
                 $$ = nullptr;
             } else {
-                // Valid array element access
                 $$ = new Variable(sym, $3);
             }
-    }
+        }
+
         delete $1;
     }
     ;
+
 //---------------------------------------------------------------------
 expression:
     primary_expression
-    {
-        if (!$1) {
-            $$ = new Expression(0);  // Default to error state
-        } else {
-            $$ = $1;
-        }
+    { 
+        $$ = ($1 == nullptr) ? new Expression(0) : $1;
     }
     | expression T_OR expression
     {
-        bool valid_left = ($1 && $1->get_type() != STRING);
-        bool valid_right = ($3 && $3->get_type() != STRING);
+        bool lhs_valid = ($1 != nullptr && $1->get_type() != STRING);
+        bool rhs_valid = ($3 != nullptr && $3->get_type() != STRING);
 
-        if (!valid_left) {
+        if (!lhs_valid) {
             Error::error(Error::INVALID_LEFT_OPERAND_TYPE, "||", gpl_type_to_string($1->get_type()));
         }
-        if (!valid_right) {
+        if (!rhs_valid) {
             Error::error(Error::INVALID_RIGHT_OPERAND_TYPE, "||", gpl_type_to_string($3->get_type()));
         }
 
-        $$ = (valid_left && valid_right) ? new Expression(OR, $1, $3) : new Expression(0);
+        $$ = (!lhs_valid || !rhs_valid) ? new Expression(0) : new Expression(OR, $1, $3);
     }
     | expression T_AND expression
     {
-        bool valid_left = ($1 && $1->get_type() != STRING);
-        bool valid_right = ($3 && $3->get_type() != STRING);
+        bool lhs_valid = ($1 != nullptr && $1->get_type() != STRING);
+        bool rhs_valid = ($3 != nullptr && $3->get_type() != STRING);
 
-        if (!valid_left) {
+        if (!lhs_valid) {
             Error::error(Error::INVALID_LEFT_OPERAND_TYPE, "&&", gpl_type_to_string($1->get_type()));
         }
-        if (!valid_right) {
+        if (!rhs_valid) {
             Error::error(Error::INVALID_RIGHT_OPERAND_TYPE, "&&", gpl_type_to_string($3->get_type()));
         }
 
-        $$ = (valid_left && valid_right) ? new Expression(AND, $1, $3) : new Expression(0);
+        $$ = (!lhs_valid || !rhs_valid) ? new Expression(0) : new Expression(AND, $1, $3);
     }
     | expression T_LESS_EQUAL expression
     {
-        $$ = ($1 && $3) ? new Expression(LESS_EQUAL, $1, $3) : new Expression(0);
+        $$ = ($1 == nullptr || $3 == nullptr) 
+            ? new Expression(0) 
+            : new Expression(LESS_EQUAL, $1, $3);
     }
     | expression T_GREATER_EQUAL expression
     {
-        $$ = ($1 && $3) ? new Expression(GREATER_EQUAL, $1, $3) : new Expression(0);
+        $$ = ($1 == nullptr || $3 == nullptr) 
+            ? new Expression(0) 
+            : new Expression(GREATER_EQUAL, $1, $3);
     }
     | expression T_LESS expression
     {
-        $$ = ($1 && $3) ? new Expression(LESS_THAN, $1, $3) : new Expression(0);
+        $$ = ($1 == nullptr || $3 == nullptr) 
+            ? new Expression(0) 
+            : new Expression(LESS_THAN, $1, $3);
     }
     | expression T_GREATER expression
     {
-        $$ = ($1 && $3) ? new Expression(GREATER_THAN, $1, $3) : new Expression(0);
+        $$ = ($1 == nullptr || $3 == nullptr) 
+            ? new Expression(0) 
+            : new Expression(GREATER_THAN, $1, $3);
     }
     | expression T_EQUAL expression
     {
-        $$ = ($1 && $3) ? new Expression(EQUAL, $1, $3) : new Expression(0);
+        $$ = ($1 == nullptr || $3 == nullptr) 
+            ? new Expression(0) 
+            : new Expression(EQUAL, $1, $3);
     }
     | expression T_NOT_EQUAL expression
     {
-        $$ = ($1 && $3) ? new Expression(NOT_EQUAL, $1, $3) : new Expression(0);
+        $$ = ($1 == nullptr || $3 == nullptr) 
+            ? new Expression(0) 
+            : new Expression(NOT_EQUAL, $1, $3);
     }
     | expression T_PLUS expression
     {
-        if (!$1 || !$3) {
+        if ($1 == nullptr || $3 == nullptr) {
             $$ = new Expression(0);
         } else if ($1->get_type() == STRING || $3->get_type() == STRING) {
-            std::string* combined_string = new std::string($1->eval_string() + $3->eval_string());
-            $$ = new Expression(combined_string);
+            auto result = new string($1->eval_string() + $3->eval_string());
+            $$ = new Expression(result);
         } else {
             $$ = new Expression(PLUS, $1, $3);
         }
     }
     | expression T_MINUS expression
     {
-        bool valid_left = ($1 && $1->get_type() != STRING);
-        bool valid_right = ($3 && $3->get_type() != STRING);
+        bool lhs_valid = ($1 != nullptr && $1->get_type() != STRING);
+        bool rhs_valid = ($3 != nullptr && $3->get_type() != STRING);
 
-        if (!valid_left) {
+        if (!lhs_valid) {
             Error::error(Error::INVALID_LEFT_OPERAND_TYPE, "-", gpl_type_to_string($1->get_type()));
         }
-        if (!valid_right) {
+        if (!rhs_valid) {
             Error::error(Error::INVALID_RIGHT_OPERAND_TYPE, "-", gpl_type_to_string($3->get_type()));
         }
 
-        $$ = (valid_left && valid_right) ? new Expression(MINUS, $1, $3) : new Expression(0);
+        $$ = (!lhs_valid || !rhs_valid) ? new Expression(0) : new Expression(MINUS, $1, $3);
     }
     | expression T_MULTIPLY expression
     {
-        bool valid_left = ($1 && $1->get_type() != STRING);
-        bool valid_right = ($3 && $3->get_type() != STRING);
+        bool lhs_valid = ($1 != nullptr && $1->get_type() != STRING);
+        bool rhs_valid = ($3 != nullptr && $3->get_type() != STRING);
 
-        if (!valid_left) {
+        if (!lhs_valid) {
             Error::error(Error::INVALID_LEFT_OPERAND_TYPE, "*", gpl_type_to_string($1->get_type()));
         }
-        if (!valid_right) {
+        if (!rhs_valid) {
             Error::error(Error::INVALID_RIGHT_OPERAND_TYPE, "*", gpl_type_to_string($3->get_type()));
         }
 
-        $$ = (valid_left && valid_right) ? new Expression(MULTIPLY, $1, $3) : new Expression(0);
+        $$ = (!lhs_valid || !rhs_valid) ? new Expression(0) : new Expression(MULTIPLY, $1, $3);
     }
     | expression T_DIVIDE expression
     {
-        bool valid_left = ($1 && $1->get_type() != STRING);
-        bool valid_right = ($3 && $3->get_type() != STRING);
+        bool lhs_valid = ($1 != nullptr && $1->get_type() != STRING);
+        bool rhs_valid = ($3 != nullptr && $3->get_type() != STRING);
 
-        if (!valid_left) {
+        if (!lhs_valid) {
             Error::error(Error::INVALID_LEFT_OPERAND_TYPE, "/", gpl_type_to_string($1->get_type()));
         }
-        if (!valid_right) {
+        if (!rhs_valid) {
             Error::error(Error::INVALID_RIGHT_OPERAND_TYPE, "/", gpl_type_to_string($3->get_type()));
         }
 
-        $$ = (valid_left && valid_right) ? new Expression(DIVIDE, $1, $3) : new Expression(0);
+        $$ = (!lhs_valid || !rhs_valid) ? new Expression(0) : new Expression(DIVIDE, $1, $3);
     }
     | expression T_MOD expression
     {
-        bool valid_left = ($1 && $1->get_type() == INT);
-        bool valid_right = ($3 && $3->get_type() == INT);
+        bool lhs_valid = ($1 != nullptr && $1->get_type() == INT);
+        bool rhs_valid = ($3 != nullptr && $3->get_type() == INT);
 
-        if (!valid_left) {
+        if (!lhs_valid) {
             Error::error(Error::INVALID_LEFT_OPERAND_TYPE, "%", gpl_type_to_string($1->get_type()));
         }
-        if (!valid_right) {
+        if (!rhs_valid) {
             Error::error(Error::INVALID_RIGHT_OPERAND_TYPE, "%", gpl_type_to_string($3->get_type()));
         }
 
-        $$ = (valid_left && valid_right) ? new Expression(MOD, $1, $3) : new Expression(0);
+        $$ = (!lhs_valid || !rhs_valid) ? new Expression(0) : new Expression(MOD, $1, $3);
     }
     | T_MINUS expression %prec UNARY_OPS
     {
-        if (!$2) {
+        if ($2 == nullptr) {
             $$ = new Expression(0);
         } else if ($2->get_type() == STRING) {
             Error::error(Error::INVALID_RIGHT_OPERAND_TYPE, "-", gpl_type_to_string($2->get_type()));
@@ -621,7 +715,7 @@ expression:
     }
     | T_NOT expression %prec UNARY_OPS
     {
-        if (!$2) {
+        if ($2 == nullptr) {
             $$ = new Expression(0);
         } else if ($2->get_type() == STRING) {
             Error::error(Error::INVALID_RIGHT_OPERAND_TYPE, "!", gpl_type_to_string($2->get_type()));
@@ -632,10 +726,12 @@ expression:
     }
     | math_operator T_LPAREN expression T_RPAREN
     {
-        if (!$3) {
+        if ($3 == nullptr) {
             $$ = new Expression(0);
         } else if ($3->get_type() == STRING) {
-            Error::error(Error::INVALID_RIGHT_OPERAND_TYPE, operator_to_string(static_cast<Operator_type>($1)), gpl_type_to_string($3->get_type()));
+            Error::error(Error::INVALID_RIGHT_OPERAND_TYPE, 
+                         operator_to_string(static_cast<Operator_type>($1)), 
+                         gpl_type_to_string($3->get_type()));
             $$ = new Expression(0);
         } else {
             $$ = new Expression(static_cast<Operator_type>($1), $3);
@@ -645,36 +741,39 @@ expression:
 
 //---------------------------------------------------------------------
 primary_expression:
-    T_LPAREN expression T_RPAREN
-    {
-        $$ = $2;
+    T_LPAREN expression T_RPAREN 
+    { 
+        $$ = ($2 == nullptr) ? new Expression(0) : $2;
     }
-    | variable
-    {
-        $$ = new Expression($1);
+    | variable 
+    { 
+        $$ = ($1 == nullptr) ? new Expression(0) : new Expression($1);
     }
-    | T_INT_CONSTANT
-    {
-        $$ = new Expression($1);
+    | T_INT_CONSTANT 
+    { 
+        $$ = new Expression($1); 
     }
-    | T_DOUBLE_CONSTANT
-    {
-        $$ = new Expression($1);
+    | T_TRUE 
+    { 
+        $$ = new Expression(1); 
     }
-    | T_STRING_CONSTANT
-    {
-        $$ = new Expression($1);
+    | T_FALSE 
+    { 
+        $$ = new Expression(0); 
+    }
+    | T_DOUBLE_CONSTANT 
+    { 
+        $$ = new Expression($1); 
+    }
+    | T_STRING_CONSTANT 
+    { 
+        $$ = new Expression($1); 
     }
     ;
 
 //---------------------------------------------------------------------
 math_operator:
-    T_MULTIPLY { $$ = MULTIPLY; }
-    | T_DIVIDE { $$ = DIVIDE; }
-    | T_PLUS { $$ = PLUS; }
-    | T_MINUS { $$ = MINUS; }
-    | T_MOD { $$ = MOD; }
-    | T_SIN { $$ = SIN; }
+    T_SIN { $$ = SIN; }
     | T_COS { $$ = COS; }
     | T_TAN { $$ = TAN; }
     | T_ASIN { $$ = ASIN; }

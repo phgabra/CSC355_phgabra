@@ -1,1 +1,0 @@
-assertion "m_type == STRING || m_type == INT || m_type == DOUBLE" failed: file "expression.cpp", line 345.  Input line 2.

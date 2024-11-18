@@ -39,11 +39,11 @@ else ifeq ($(PHASE),P4)
   MACRO_DEFINITIONS = -DSYMBOL_TABLE -DP4
 else ifeq ($(PHASE),P5)
   MACRO_DEFINITIONS = -DSYMBOL_TABLE -DP5
-else ifeq ($(PHASE),p6)
+else ifeq ($(PHASE),P6)
   MACRO_DEFINITIONS = -DSYMBOL_TABLE -DGRAPHICS -DP5 -DP6
-else ifeq ($(PHASE),p7)
+else ifeq ($(PHASE),P7)
   MACRO_DEFINITIONS = -DSYMBOL_TABLE -DGRAPHICS -DP5 -DP6 -DP7
-else ifeq ($(PHASE),p8)
+else ifeq ($(PHASE),P8)
   MACRO_DEFINITIONS = -DSYMBOL_TABLE -DGRAPHICS -DP5 -DP6 -DP7 -DP8
 else
   PHASE = UNKNOWN PHASE: THIS IS AN ERROR (bad directory name, must be p3,p4,...p8)

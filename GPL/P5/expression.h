@@ -3,7 +3,7 @@
 #define EXPRESSION_H
 
 #include "gpl_type.h"
-
+#include "variable.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -36,11 +36,15 @@ class Expression
     int eval_int();
     double eval_double();
     string eval_string();
-
+    Variable* get_variable() const { return m_variable; }
+    bool is_constant() {return m_constant != NULL;}
+    bool is_array_expression() {
+        return m_variable && m_variable->is_array();
+    }
     bool eval_variable() {return m_variable;}
-
+    bool is_array_element() {return m_variable && m_variable->is_array_element();}
   private:
-
+    bool m_is_element;
     Gpl_type m_type = NO_TYPE;
     Operator_type m_op = NO_OP;
     Expression *m_rhs = NULL;

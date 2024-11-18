@@ -21,15 +21,6 @@ class Symbol
     Symbol(std::string name, int initial_value);
     Symbol(std::string name, double initial_value);
     Symbol(std::string name, std::string initial_value);
-
-    // Setter for int values
-    void set_int_value(int value, int index = UNDEFINED_INDEX);
-
-    // Setter for double values
-    void set_double_value(double value, int index = UNDEFINED_INDEX);
-
-    // Setter for string values
-    void set_string_value(const std::string &value, int index = UNDEFINED_INDEX);
   
     // array: int, double, string, circle, rectangle, triangle, textbox, pixmap
     Symbol(std::string name, Gpl_type type, int size);
@@ -57,12 +48,21 @@ class Symbol
     bool is_game_object() const {return m_type & GAME_OBJECT;}
     bool is_animation_block() const {return m_type == ANIMATION_BLOCK;}
     
+      // Set values for array elements
+    void set_value(int index, int value);
+    void set_value(int index, double value);
+    void set_value(int index, const std::string& value);
+    void set_value(int value);
+    void set_value(double value);
+    void set_value(const std::string& value);
     void validate_type_and_index(Gpl_type type, int index) const;
     int get_int_value(int index = UNDEFINED_INDEX) const;
     double get_double_value(int index = UNDEFINED_INDEX) const;
     std::string get_string_value(int index = UNDEFINED_INDEX) const;
 
     void print(std::ostream &os) const;
+
+    void* get_data_void_ptr() { return m_data_void_ptr; }
 
   private:
     Symbol(const Symbol&);  // disable default copy constructor

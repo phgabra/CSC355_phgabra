@@ -6,9 +6,9 @@ using namespace std;
 #include <vector>
 #include <algorithm> // for sort algorithm
 
-/* static */ Symbol_table *Symbol_table::m_instance = 0;
+Symbol_table *Symbol_table::m_instance = 0;
 
-/* static */ Symbol_table * Symbol_table::instance()
+Symbol_table * Symbol_table::instance()
 {
   if (!m_instance)
     m_instance = new Symbol_table();
@@ -17,54 +17,65 @@ using namespace std;
 
 Symbol_table::Symbol_table(){}
 
+//Destructor to get rid of the symbol table
+// and clean up resources
 Symbol_table::~Symbol_table()
 {
-  cerr << "~Symbol_table()... not implemented..." << endl;
+  for (auto& key_value_pair : m_symbols)
+  {
+    //Clear up the symbol associated
+    //with the key
+    delete key_value_pair.second;
+  }
+  //Finally, remove the key-value pairs
+  m_symbols.clear();
 }
 
 
 bool Symbol_table::insert(Symbol *symbol)
 {
-    auto result = m_symbols.emplace(symbol->get_name(), symbol);
-    if (!result.second)
+  //if the symbol is already in the table, return false
+  string symbol_name = (*symbol).get_name();
+  if(m_symbols.find(symbol_name) != m_symbols.end())
     {
         return false;
     }
+
+    m_symbols[symbol_name] = symbol;
     return true;
 }
 
 Symbol *Symbol_table::lookup(string name) const
 {
     auto iterator = m_symbols.find(name);
-    if (iterator == m_symbols.end())
+    if(iterator == m_symbols.end())
     {
         return nullptr;
     }
-    else
-    {
-        return iterator->second;
-    }
+    return (*iterator).second;
 }
 
 // comparison function for the STL sort algorithm
 bool compare_symbols(Symbol *a, Symbol *b) 
 {
-    return a->get_name() < b->get_name();
+  string a_name = (*a).get_name();
+  string b_name = (*b).get_name();
+  return a_name < b_name;
 }
 
 
 void Symbol_table::print(ostream &os) const
 {
-  vector<Symbol *> symbols;
+  vector<Symbol*> sorted_symbols;
+  for(auto iterator = m_symbols.begin(); iterator != m_symbols.end(); ++iterator)
+  {
+    sorted_symbols.push_back((*iterator).second);
+  }
+  sort(sorted_symbols.begin(), sorted_symbols.end(), compare_symbols);
 
-  // (1) add all symbols in the table into a vector.
-  for (const auto &pair : m_symbols)
-        symbols.push_back(pair.second);
+  for ( auto symbol : sorted_symbols )
+  {
+    (*symbol).print(os);
+  }
 
-  // (2) sort the vector.
-  sort(symbols.begin(), symbols.end(), compare_symbols);
-
-  // (3) print the elements (symbols) in the vector.
-  for (const auto &symbol : symbols)
-        symbol->print(os);
 }

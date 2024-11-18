@@ -2,7 +2,6 @@
 using namespace std;
 
 #include "expression.h"
-
 #include "constant.h"
 #include "variable.h"
 #include "gpl_assert.h"
@@ -10,48 +9,54 @@ using namespace std;
 
 Expression::Expression(int value)
 {
-    m_type = INT;
-    m_constant = new Constant(value);
     m_variable = nullptr;
     m_lhs = nullptr;
     m_rhs = nullptr;
-    m_op = NO_OP;
+
+    m_type = INT;
+    m_constant = new Constant(value);
 }
 
 Expression::Expression(double value)
 {
-    m_type = DOUBLE;
-    m_constant = new Constant(value);
     m_variable = nullptr;
     m_lhs = nullptr;
     m_rhs = nullptr;
-    m_op = NO_OP;
+
+    m_type = DOUBLE;
+    m_constant = new Constant(value);
 }
 
 Expression::Expression(string *value)
 {
-    m_type = STRING;
-    m_constant = new Constant(*value);
     m_variable = nullptr;
     m_lhs = nullptr;
     m_rhs = nullptr;
-    m_op = NO_OP;
+
+    m_type = STRING;
+    m_constant = new Constant(*value);
 }
 
 Expression::Expression(Variable *variable)
 {
     if (variable == nullptr) {
-        m_type = INT;  // Default to INT if variable is null
+        m_constant = nullptr;
         m_variable = nullptr;
-    } else {
-        m_type = variable->get_type();
-        m_variable = variable;
-    }
+        m_lhs = nullptr;
+        m_rhs = nullptr;
+
+        m_type = INT;
+
+        return;
+    } 
 
     m_constant = nullptr;
     m_lhs = nullptr;
     m_rhs = nullptr;
-    m_op = NO_OP;
+
+    m_type = variable->get_type();
+    m_variable = variable;
+    m_is_element = variable->is_array();
 }
 
 Expression::Expression(Operator_type op,
@@ -59,62 +64,87 @@ Expression::Expression(Operator_type op,
                        Expression *rhs
                        )
 {
-    m_op = op;
-    m_lhs = lhs;
-    m_rhs = rhs;
     m_constant = nullptr;
     m_variable = nullptr;
 
-    if(op == PLUS || op == MINUS || op == MULTIPLY || op == DIVIDE){
-      if(lhs->m_type == DOUBLE || rhs->m_type == DOUBLE ){
-        m_type == DOUBLE;
-      }
-      else{
-        m_type == INT;
+    m_op = op;
+    m_lhs = lhs;
+    m_rhs = rhs;
 
-      }
-    }
-    else if(op == AND || op == OR || op == EQUAL || op == NOT_EQUAL || op == LESS_EQUAL || op == LESS_THAN || op == GREATER_THAN ||  op == GREATER_EQUAL || op == MOD){
-      m_type == INT;
+    
+  switch (op) {
+      case PLUS:
+      case MINUS:
+      case MULTIPLY:
+      case DIVIDE:
+          m_type = (lhs->m_type == DOUBLE || rhs->m_type == DOUBLE) ? DOUBLE : INT;
+          break;
+
+      case AND:
+      case OR:
+      case EQUAL:
+      case NOT_EQUAL:
+      case LESS_THAN:
+      case LESS_EQUAL:
+      case GREATER_THAN:
+      case GREATER_EQUAL:
+          m_type = INT;
+          break;
+
+      case MOD:
+          m_type = INT;
+          break;
+      default:
+          assert(false && "Unknown unary operator");
   }
 }
 
 Expression::Expression(Operator_type op, Expression *operand)
 {
-    m_lhs = operand;   
-    m_op = op; 
-    switch(op){
-      case SIN:
-      case COS:
-      case TAN:
-      case ATAN:
-      case ACOS:
-      case ASIN:
-      case SQRT:
-        m_type = DOUBLE;
-        break;
-      case FLOOR:
-      case RANDOM:
-        m_type = INT;
-        break;
-      case ABS:
-      case UNARY_MINUS:
-        m_type = operand -> m_type;
-        break;
-      default:
-        assert(false && "Unkonwn operator");
+    m_rhs = nullptr;
+    m_constant = nullptr;
+    m_variable = nullptr;
+
+    m_op = op;
+    m_lhs = operand;
+    
+    switch (op) {
+        case NOT:
+            m_type = INT;
+            break;
+        case UNARY_MINUS:
+            m_type = operand->m_type;
+            break;
+        case ABS:
+            m_type = operand->m_type;
+            break;
+        case SIN:
+        case COS:
+        case TAN:
+        case ASIN:
+        case ACOS:
+        case ATAN:
+        case SQRT:
+            m_type = DOUBLE;
+            break;
+        case FLOOR:
+        case RANDOM:
+            m_type = INT;
+            break;
+        default:
+            assert(false && "Unknown  operator");
     }
-
-    m_type = operand->get_type(); 
 }
-
 
 int Expression::eval_int()
 {
-  assert(m_type == INT);
+    assert(m_type == INT || m_type == DOUBLE);
 
-  if (m_constant != NULL)
-  {
+    if (m_type == DOUBLE)
+        return static_cast<int>(eval_double());
+
+    if (m_constant != NULL)
+    {
     assert(m_variable == NULL);
     assert(m_lhs == NULL && m_rhs == NULL);
 
@@ -327,7 +357,6 @@ double Expression::eval_double()
     case SQRT:
       return sqrt(m_lhs->eval_double());
     case ABS:
-      // new version of abs handles doubles
       return std::abs(m_lhs->eval_double());
     case FLOOR:
       assert(false && "should never have a double floor");
@@ -342,7 +371,7 @@ double Expression::eval_double()
 string Expression::eval_string()
 {
   // can only call eval_string() on the following types of expressions
-  assert(m_type == STRING || m_type == INT || m_type == DOUBLE);
+  assert(m_type == STRING || m_type == INT || m_type == DOUBLE || m_type == INT_ARRAY || m_type == DOUBLE_ARRAY);
 
   // INT and DOUBLE expressions are automatically cast into strings
   // for example:  the int 42 is converted into the string "42"

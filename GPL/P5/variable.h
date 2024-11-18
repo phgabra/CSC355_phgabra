@@ -50,9 +50,12 @@ class Variable
     // For arrays.
     Variable(Symbol *symbol, Expression *expression);
 
+    // For placeholder variables.
+    Variable();
+
     std::string get_name() const;
     bool is_array() const {return m_expression != NULL;}
-
+    bool is_array_element() const { return is_array() && m_expression != nullptr; }
     // Getter functions.The functions return the value of the variable stored in 
     // the symbol's m_data_void_ptr. The functions need to handle two different types of
     // variables: (1) regular variable, (2) array.
@@ -75,6 +78,8 @@ class Variable
     void set(int value);
     void set(double value);
     void set(std::string value);
+    int size() const {return m_size;}
+    bool is_valid() const {return m_is_valid;}
 
   private:
     Variable(const Variable&);  // disable default copy constructor
@@ -86,6 +91,8 @@ class Variable
 
     Symbol *m_symbol = NULL;
     Gpl_type m_type = NO_TYPE;
+    bool m_is_valid;
+    int m_size;
     // The variable object sets m_expression pointer to the expression object
     // that represents an index of an array. For example,
     // arr[5] : 5 is an expression.

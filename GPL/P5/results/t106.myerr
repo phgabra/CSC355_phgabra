@@ -1,2 +1,0 @@
-Semantic error on line 1: Variable 'i' was not declared before it was used.
-Semantic error on line 1: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'int''.

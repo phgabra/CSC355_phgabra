@@ -1,2 +1,0 @@
-Semantic error on line 2: Cannot assign an expression of type '' to a variable of type 'Cannot assign an expression of type 'no type' to a variable of type 'string''.
-Parse error on line 3 reported by parser: syntax error, unexpected [, expecting ;.
