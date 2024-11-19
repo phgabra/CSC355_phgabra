@@ -17,6 +17,14 @@ class Symbol
 {
   public:
 
+    bool Symbol::is_game_object() const;
+
+    // Constructor for game_objects
+    Symbol(std::string name, Gpl_type type);
+
+    // Returns game_object value
+    Game_object* get_game_object_value(int index = UNDEFINED_INDEX) const;
+
     // non-array variables
     Symbol(std::string name, int initial_value);
     Symbol(std::string name, double initial_value);

@@ -30,6 +30,9 @@
 
 class Expression;
 class Variable;
+
+#include "event_manager.h"
+#include "game_object.h"
 // put new included ABOVE this line
 #include "gpl_type.h"
 #include "y.tab.h"

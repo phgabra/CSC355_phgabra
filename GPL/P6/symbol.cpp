@@ -1,5 +1,15 @@
 #include "symbol.h"
 #include "gpl_assert.h"
+#include "event_manager.h"
+#include "statement_block.h"
+#include "animation_block.h"
+#include "game_object.h"
+#include "triangle.h"
+#include "pixmap.h"
+#include "circle.h"
+#include "rectangle.h"
+#include "textbox.h"
+#include "window.h"
 
 using namespace std;
 
@@ -41,33 +51,86 @@ Symbol::Symbol(string name, Gpl_type type, int size)
     {
         case INT_ARRAY:
             m_data_void_ptr = (void *) new int[size];
-            // Initialize all elements to 0
-            for (int i = 0; i < size; i++) {
-                ((int*)m_data_void_ptr)[i] = 0;
-            }
+            for (int i = 0; i < size; i++)
+                ((int *)m_data_void_ptr)[i] = 0;
             break;
-            
+
         case DOUBLE_ARRAY:
             m_data_void_ptr = (void *) new double[size];
-            // Initialize all elements to 0.0
-            for (int i = 0; i < size; i++) {
-                ((double*)m_data_void_ptr)[i] = 0.0;
-            }
+            for (int i = 0; i < size; i++)
+                ((double *)m_data_void_ptr)[i] = 0.0;
             break;
-            
+
         case STRING_ARRAY:
             m_data_void_ptr = (void *) new string[size];
-            // Initialize all elements to empty string
-            for (int i = 0; i < size; i++) {
-                ((string*)m_data_void_ptr)[i] = "";
-            }
+            for (int i = 0; i < size; i++)
+                ((string *)m_data_void_ptr)[i] = "";
             break;
-            
+
+        case CIRCLE_ARRAY:
+            m_data_void_ptr = (void *) new Circle[size];
+            break;
+
+        case RECTANGLE_ARRAY:
+            m_data_void_ptr = (void *) new Rectangle[size];
+            break;
+
+        case TRIANGLE_ARRAY:
+            m_data_void_ptr = (void *) new Triangle[size];
+            break;
+
+        case TEXTBOX_ARRAY:
+            m_data_void_ptr = (void *) new Textbox[size];
+            break;
+
+        case PIXMAP_ARRAY:
+            m_data_void_ptr = (void *) new Pixmap[size];
+            break;
+
         default:
-            assert(0);  // if somehow an invalid type is passed in
+            assert(0); // Unhandled type
     }
 
     validate();
+}
+
+Symbol::Symbol(string name, Gpl_type type)
+{
+    assert(type == CIRCLE
+           || type == RECTANGLE
+           || type == TRIANGLE
+           || type == TEXTBOX
+           || type == PIXMAP
+           || type == ANIMATION_BLOCK
+          );
+  
+    m_name = name;
+    m_type = type;
+    m_size = UNDEFINED_SIZE;
+  
+    switch(type)
+    {
+        case CIRCLE:
+            m_data_void_ptr = (void *) new Circle();
+            break;
+        case RECTANGLE:
+            m_data_void_ptr = (void *) new Rectangle();
+            break;
+        case TRIANGLE:
+            m_data_void_ptr = (void *) new Triangle();
+            break;
+        case TEXTBOX:
+            m_data_void_ptr = (void *) new Textbox();
+            break;
+        case PIXMAP:
+            m_data_void_ptr = (void *) new Pixmap();
+            break;
+        case ANIMATION_BLOCK:
+            m_data_void_ptr = (void *) new Animation_block();
+            break;
+        default:
+            assert(0); // Unhandled type
+    }
 }
 
 Symbol::~Symbol()
@@ -136,6 +199,56 @@ string Symbol::get_string_value(int index /* = UNDEFINED_INDEX */) const
         return *((string *) m_data_void_ptr);
 }
 
+Game_object *Symbol::get_game_object_value(int index /* = UNDEFINED_INDEX */) const
+{
+    validate_type_and_index(GAME_OBJECT, index);
+  
+    if (is_array())
+    {
+      // since this is an array of actual object, can't consider it an array of Game_object
+      // must consider each type: Rectangle, Triangle, etc...
+
+      switch(m_type)
+      {
+        case CIRCLE_ARRAY:
+        {
+          Circle *object_array = (Circle *) m_data_void_ptr;
+          return object_array + index;
+          break;
+        }
+        case RECTANGLE_ARRAY:
+        {
+            Rectangle *object_array = (Rectangle *) m_data_void_ptr;
+            return &object_array[index];
+        }
+        case TRIANGLE_ARRAY:
+        {
+            Triangle *object_array = (Triangle *) m_data_void_ptr;
+            return &object_array[index];
+        }
+        case TEXTBOX_ARRAY:
+        {
+            Textbox *object_array = (Textbox *) m_data_void_ptr;
+            return &object_array[index];
+        }
+        case PIXMAP_ARRAY:
+        {
+            Pixmap *object_array = (Pixmap *) m_data_void_ptr;
+            return &object_array[index];
+        }
+
+        default: 
+        {
+          assert(false && "given type is not handled by switch");
+          return NULL;
+        }
+      }
+    }
+    else
+      // m_data_void_ptr is a void pointer, that really points to a Game_object.
+      return (Game_object *) m_data_void_ptr;
+}
+
 //Added these series of setter methods
 void Symbol::set_value(int value) {
     assert(is_int() && !is_array());
@@ -175,11 +288,7 @@ void Symbol::set_value(int index, const string& value) {
 
 void Symbol::print(ostream &os) const
 {
-
-    //if it's an array, get the type and name of the array
-    //as well as value at the current index
-    //and print in the appropriate format for each element
-    //contained in the array
+    // If it's an array, iterate through elements and print them
     if (is_array())
     {
         for (int i = 0; i < m_size; i++)
@@ -191,13 +300,20 @@ void Symbol::print(ostream &os) const
                 os << get_double_value(i);
             else if (is_string())
                 os << "\"" << get_string_value(i) << "\"";
-        
-            if(i < m_size - 1)
+            else if (is_game_object())
+            {
+                Game_object* obj = get_game_object_value(i);
+                if (obj)
+                    os << obj;
+                else
+                    os << "null";
+            }
+            
+            if (i < m_size - 1)
                 os << std::endl;
         }
     }
-    //if it's not an array, just print the type, name, and value of the symbol
-    else
+    else // If it's not an array, print the single value
     {
         os << gpl_type_to_string(get_base_type()) << " ";
 
@@ -212,10 +328,19 @@ void Symbol::print(ostream &os) const
             os << get_double_value();
         else if (is_string())
             os << "\"" << get_string_value() << "\"";
+        else if (is_game_object())
+        {
+            Game_object* obj = get_game_object_value();
+            if (obj)
+                os << obj;
+            else
+                os << "null";
+        }
     }
 
     os << endl;
 }
+
 
 void Symbol::validate() const
 {

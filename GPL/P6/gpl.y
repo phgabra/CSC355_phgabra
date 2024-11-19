@@ -21,6 +21,10 @@ extern int yyerror(const char *);
 extern int line_count;  // from gpl.l, used for statement blocks
 
 int undeclared = 0;
+// Global variable to make the construction of object much less complex
+// Only one object can ever be under construction at one time
+Game_object *cur_object_under_construction = 0;
+string cur_object_under_construction_name;
 
 %}
 
@@ -151,6 +155,7 @@ int undeclared = 0;
 %nonassoc UNARY_OPS
 
 %type <gpl_type> simple_type
+%type <gpl_type> object_type
 %type <union_expression> expression
 %type <union_expression> primary_expression
 %type <union_expression> optional_initializer
@@ -340,17 +345,56 @@ optional_initializer:
 
 //---------------------------------------------------------------------
 object_declaration:
-    object_type T_ID T_LPAREN parameter_list_or_empty T_RPAREN
+    object_type T_ID 
+    {
+        // create a new object and it's symbol
+        // (Symbol() creates the new object);
+        Symbol *symbol = new Symbol(*$2, $1);
+    
+        if (!symbol_table->insert(symbol))
+        {
+        Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, *$2);
+        }
+
+        // assign to global variable so the parameters can be inserted into
+        // this object when each parameter is parsed
+        cur_object_under_construction = symbol->get_game_object_value();
+        cur_object_under_construction_name = symbol->get_name();
+    }
+    T_LPAREN parameter_list_or_empty T_RPAREN 
+    {
+        cur_object_under_construction = NULL;
+        delete $2; // Scanner allocates memory for each T_ID string
+    }
     | object_type T_ID T_LBRACKET expression T_RBRACKET
+    {
+        // Create an array of objects
+        int size = $4->eval_int();
+
+        if (size <= 0)
+        {
+            Error::error(Error::INVALID_ARRAY_SIZE, *$2);
+        }
+        else
+        {
+            Symbol *symbol = new Symbol(*$2, $1, size);
+
+            if (!symbol_table->insert(symbol))
+            {
+                Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, *$2);
+            }
+        }
+        delete $4; // Free memory allocated for the expression
+    }
     ;
 
 //---------------------------------------------------------------------
 object_type:
-    T_TRIANGLE
-    | T_PIXMAP
-    | T_CIRCLE
-    | T_RECTANGLE
-    | T_TEXTBOX
+    T_TRIANGLE { $$ = TRIANGLE; }
+    | T_PIXMAP { $$ = PIXMAP; }
+    | T_CIRCLE { $$ = CIRCLE; }
+    | T_RECTANGLE { $$ = RECTANGLE; }
+    | T_TEXTBOX { $$ = TEXTBOX; }
     ;
 
 //---------------------------------------------------------------------
