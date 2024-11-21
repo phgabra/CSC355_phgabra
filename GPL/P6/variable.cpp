@@ -83,6 +83,15 @@ string Variable::get_string_value() const
     return m_symbol->get_string_value();
 }
 
+Animation_block *Variable::get_animation_block_value() const
+{
+    // Ensure the Variable is of type ANIMATION_BLOCK
+    assert(m_type == ANIMATION_BLOCK);
+
+    // Return the stored Animation_block pointer
+    return m_symbol->get_animation_block_value();
+}
+
 void Variable::set(int value)
 {
     if (m_expression)

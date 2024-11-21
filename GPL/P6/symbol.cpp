@@ -126,7 +126,7 @@ Symbol::Symbol(string name, Gpl_type type)
             m_data_void_ptr = (void *) new Pixmap();
             break;
         case ANIMATION_BLOCK:
-            m_data_void_ptr = (void *) new Animation_block();
+            m_data_void_ptr = nullptr; // No object created until explicitly set
             break;
         default:
             assert(0); // Unhandled type
@@ -137,22 +137,59 @@ Symbol::~Symbol()
 {
   // The Symbol "owns" the object it contains, it must delete it
   if (!is_array())
+  {
     switch (m_type)
     {
-      case INT: delete (int *) m_data_void_ptr; break;
-      case DOUBLE: delete (double *) m_data_void_ptr; break;
-      case STRING: delete (string *) m_data_void_ptr; break;
-      default: assert(0);
+      case INT: 
+          delete (int *) m_data_void_ptr; 
+          break;
+      case DOUBLE: 
+          delete (double *) m_data_void_ptr; 
+          break;
+      case STRING: 
+          delete (string *) m_data_void_ptr; 
+          break;
+      case CIRCLE: 
+          delete (Circle *) m_data_void_ptr; 
+          break;
+      case RECTANGLE: 
+          delete (Rectangle *) m_data_void_ptr; 
+          break;
+      case TRIANGLE: 
+          delete (Triangle *) m_data_void_ptr; 
+          break;
+      case TEXTBOX: 
+          delete (Textbox *) m_data_void_ptr; 
+          break;
+      case PIXMAP: 
+          delete (Pixmap *) m_data_void_ptr; 
+          break;
+      case ANIMATION_BLOCK: 
+          delete (Animation_block *) m_data_void_ptr; 
+          break;
+      default: 
+          assert(0); // Unhandled type
     }
-  else
+  }
+  else // Arrays
+  {
     switch (m_type)
     {
-      case INT_ARRAY: delete [] (int *) m_data_void_ptr; break;
-      case DOUBLE_ARRAY: delete [] (double *) m_data_void_ptr; break;
-      case STRING_ARRAY: delete [] (string *) m_data_void_ptr; break;
-      default: assert(0);
+      case INT_ARRAY: 
+          delete [] (int *) m_data_void_ptr; 
+          break;
+      case DOUBLE_ARRAY: 
+          delete [] (double *) m_data_void_ptr; 
+          break;
+      case STRING_ARRAY: 
+          delete [] (string *) m_data_void_ptr; 
+          break;
+      default: 
+          assert(0); // Arrays of other types are not supported
     }
+  }
 }
+
 
 // strip away the ARRAY bit from the type if there is one
 Gpl_type Symbol::get_base_type() const 
@@ -249,6 +286,16 @@ Game_object *Symbol::get_game_object_value(int index /* = UNDEFINED_INDEX */) co
       return (Game_object *) m_data_void_ptr;
 }
 
+Animation_block *Symbol::get_animation_block_value() const
+  {
+    validate_type_and_index(ANIMATION_BLOCK, UNDEFINED_INDEX);
+  
+    // arrays of Animation_blocks are not allowed
+    assert(!is_array());
+    // return &(*((Animation_block *) m_data_void_ptr));
+    return (Animation_block *) m_data_void_ptr;
+}
+
 //Added these series of setter methods
 void Symbol::set_value(int value) {
     assert(is_int() && !is_array());
@@ -304,7 +351,9 @@ void Symbol::print(ostream &os) const
             {
                 Game_object* obj = get_game_object_value(i);
                 if (obj)
-                    os << obj;
+                {
+                    obj->print(m_name, os); // Pass the symbol name and output stream
+                }
                 else
                     os << "null";
             }
@@ -315,24 +364,19 @@ void Symbol::print(ostream &os) const
     }
     else // If it's not an array, print the single value
     {
-        os << gpl_type_to_string(get_base_type()) << " ";
-
-        // Print name
-        os << m_name;
-
-        os << " = ";
-
         if (is_int())
-            os << get_int_value();
+            os << gpl_type_to_string(get_base_type()) << " " << m_name << " = " << get_int_value();
         else if (is_double())
-            os << get_double_value();
+            os << gpl_type_to_string(get_base_type()) << " " << m_name << " = " << get_double_value();
         else if (is_string())
-            os << "\"" << get_string_value() << "\"";
+            os << gpl_type_to_string(get_base_type()) << " " << m_name << " = " << "\"" << get_string_value() << "\"";
         else if (is_game_object())
         {
             Game_object* obj = get_game_object_value();
             if (obj)
-                os << obj;
+            {
+                obj->print(m_name, os); // Pass the symbol name and output stream
+            }
             else
                 os << "null";
         }

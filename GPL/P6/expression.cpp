@@ -403,3 +403,12 @@ string Expression::eval_string()
   assert(m_op == PLUS);
   return m_lhs->eval_string() + m_rhs->eval_string();
 }
+
+Animation_block *Expression::eval_animation_block()
+{
+    // Ensure the Expression type is ANIMATION_BLOCK
+    assert(m_type == ANIMATION_BLOCK);
+
+    // Retrieve the Animation_block* from the associated Variable
+    return m_variable->get_animation_block_value();
+}

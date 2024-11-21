@@ -16,14 +16,8 @@ const int UNDEFINED_SIZE = -1;
 class Symbol
 {
   public:
-
-    bool Symbol::is_game_object() const;
-
     // Constructor for game_objects
     Symbol(std::string name, Gpl_type type);
-
-    // Returns game_object value
-    Game_object* get_game_object_value(int index = UNDEFINED_INDEX) const;
 
     // non-array variables
     Symbol(std::string name, int initial_value);
@@ -41,6 +35,11 @@ class Symbol
 
     // strip away the ARRAY bit.
     Gpl_type get_base_type() const;
+
+    // Returns game_object value
+    Game_object* get_game_object_value(int index = UNDEFINED_INDEX) const;
+    
+    Animation_block *get_animation_block_value() const;
 
     bool is_array() const {return m_type & ARRAY;}
     bool index_within_range(int index) 

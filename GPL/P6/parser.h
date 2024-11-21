@@ -30,6 +30,7 @@
 
 class Expression;
 class Variable;
+class Symbol;
 
 #include "event_manager.h"
 #include "game_object.h"

@@ -10,6 +10,8 @@
 #include "symbol.h"
 #include "expression.h"
 #include "variable.h"
+#include "game_object.h"
+#include "animation_block.h"
 #include <iostream>
 #include <sstream>
 #include <cmath> // for floor()
@@ -21,6 +23,7 @@ extern int yyerror(const char *);
 extern int line_count;  // from gpl.l, used for statement blocks
 
 int undeclared = 0;
+Symbol_table *sym_table = Symbol_table::instance();
 // Global variable to make the construction of object much less complex
 // Only one object can ever be under construction at one time
 Game_object *cur_object_under_construction = 0;
@@ -34,7 +37,8 @@ string cur_object_under_construction_name;
   std::string      *union_string;  // MUST be a pointer to a string ARG!
   Expression       *union_expression;
   Variable         *union_variable;
-  int              gpl_type;
+  Symbol           *symbol;
+  Gpl_type         gpl_type;
   int              math_operator_type;
 }
 
@@ -162,6 +166,7 @@ string cur_object_under_construction_name;
 %type <union_variable> variable
 %type <union_variable> variable_declaration
 %type <math_operator_type> math_operator
+%type <symbol> animation_parameter
 
 %%
 
@@ -225,7 +230,6 @@ declaration:
     }
     | simple_type T_ID T_LBRACKET expression T_RBRACKET
     {
-        Symbol_table *sym_table = Symbol_table::instance();
         std::string array_name = *$2;
         Gpl_type expr_type = $4->get_type();
 
@@ -262,7 +266,6 @@ declaration:
 variable_declaration:
     simple_type T_ID optional_initializer
     {
-        Symbol_table *sym_table = Symbol_table::instance();
         std::string var_name = *$2;
         int type = $1;
         Variable *new_variable = nullptr;
@@ -298,7 +301,6 @@ variable_declaration:
     }
     | simple_type T_ID T_LBRACKET expression T_RBRACKET
     {
-        Symbol_table *sym_table = Symbol_table::instance();
         std::string array_name = *$2;
         int array_size = $4->eval_int();
 
@@ -327,9 +329,9 @@ variable_declaration:
 
 //---------------------------------------------------------------------
 simple_type:
-    T_INT { $$ = T_INT; }
-    | T_DOUBLE { $$ = T_DOUBLE; }
-    | T_STRING { $$ = T_STRING; }
+    T_INT { $$ = INT; }
+    | T_DOUBLE { $$ = DOUBLE; }
+    | T_STRING { $$ = STRING; }
     ;
 
 //---------------------------------------------------------------------
@@ -351,10 +353,19 @@ object_declaration:
         // (Symbol() creates the new object);
         Symbol *symbol = new Symbol(*$2, $1);
     
-        if (!symbol_table->insert(symbol))
+        if (!sym_table->insert(symbol))
         {
         Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, *$2);
         }
+        // else
+        // {
+        //     // Print a success message if insertion succeeds
+        //     std::cout << "Object added to symbol table: " 
+        //               << symbol->get_name() 
+        //               << " of type " 
+        //               << gpl_type_to_string(symbol->get_type()) 
+        //               << std::endl;
+        // }
 
         // assign to global variable so the parameters can be inserted into
         // this object when each parameter is parsed
@@ -379,7 +390,7 @@ object_declaration:
         {
             Symbol *symbol = new Symbol(*$2, $1, size);
 
-            if (!symbol_table->insert(symbol))
+            if (!sym_table->insert(symbol))
             {
                 Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, *$2);
             }
@@ -412,11 +423,75 @@ parameter_list :
 //---------------------------------------------------------------------
 parameter:
     T_ID T_ASSIGN expression
+    {
+        std::string parameter = *$1;
+        delete $1; // Free memory allocated for T_ID
+
+        Expression *value_expression = $3;
+        Gpl_type value_expression_type = value_expression->get_type();
+
+        // Get the type of the parameter in the game object
+        Status status;
+        Gpl_type parameter_type;
+        status = cur_object_under_construction->get_member_variable_type(parameter, parameter_type);
+
+        if (status == OK)
+        {
+            // Check for type mismatch and assign the value
+            if (parameter_type != value_expression_type)
+            {
+                Error::error(Error::INCORRECT_CONSTRUCTOR_PARAMETER_TYPE,
+                            cur_object_under_construction_name,
+                            parameter,
+                            gpl_type_to_string(parameter_type));
+
+            }
+            else
+            {
+                // Set the parameter value based on its type
+                if (parameter_type == INT)
+                    cur_object_under_construction->set_member_variable(parameter, value_expression->eval_int());
+                else if (parameter_type == DOUBLE)
+                    cur_object_under_construction->set_member_variable(parameter, value_expression->eval_double());
+                else if (parameter_type == STRING)
+                    cur_object_under_construction->set_member_variable(parameter, value_expression->eval_string());
+                else if (parameter_type == ANIMATION_BLOCK)
+                {
+                    Animation_block *block = value_expression->eval_animation_block();
+                    cur_object_under_construction->set_member_variable(parameter, block);
+                }
+            }
+        }
+        else
+        {
+            // Handle unknown parameters
+            Error::error(Error::UNKNOWN_CONSTRUCTOR_PARAMETER,
+                         cur_object_under_construction_name,
+                         parameter);
+        }
+
+        delete value_expression; // Free memory allocated for the expression
+    }
     ;
+
 
 //---------------------------------------------------------------------
 forward_declaration:
     T_FORWARD T_ANIMATION T_ID T_LPAREN animation_parameter T_RPAREN
+    {
+        // Create a new Animation_block
+        Symbol *animation_symbol = new Symbol(*$3, ANIMATION_BLOCK);
+        if (!sym_table->insert(animation_symbol))
+        {
+            Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, *$3);
+        }
+
+        // Retrieve the Animation_block and initialize it with the parameter
+        Animation_block *animation_block = animation_symbol->get_animation_block_value();
+        animation_block->initialize($5, *$3); // Initialize with parameter symbol and name
+
+        delete $3; // Clean up
+    }
     ;
 
 //---------------------------------------------------------------------
@@ -451,6 +526,23 @@ animation_block:
 //---------------------------------------------------------------------
 animation_parameter:
     object_type T_ID
+    {
+        // Create a new Game_object parameter
+        Symbol *parameter_symbol = new Symbol(*$2, $1);
+        if (!sym_table->insert(parameter_symbol))
+        {
+            Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, *$2);
+        }
+        else
+        {
+            // Mark the object as a parameter (never animate or draw)
+            parameter_symbol->get_game_object_value()->never_animate();
+            parameter_symbol->get_game_object_value()->never_draw();
+        }
+
+        $$ = parameter_symbol; // Pass the Symbol pointer up the tree
+        delete $2; // Clean up
+    }
     ;
 
 //---------------------------------------------------------------------

@@ -46,7 +46,7 @@ else ifeq ($(PHASE),P7)
 else ifeq ($(PHASE),P8)
   MACRO_DEFINITIONS = -DSYMBOL_TABLE -DGRAPHICS -DP5 -DP6 -DP7 -DP8
 else
-  PHASE = UNKNOWN PHASE: THIS IS AN ERROR (bad directory name, must be p3,p4,...p8)
+  PHASE = UNKNOWN PHASE: THIS IS AN ERROR (bad directory name, must be P3,P4,...P8)
 endif
 
 # if this is a Linux computer, set up Linux libraries

@@ -36,6 +36,7 @@ class Expression
     int eval_int();
     double eval_double();
     string eval_string();
+    Animation_block *eval_animation_block(); // New function for ANIMATION_BLOCK
     Variable* get_variable() const { return m_variable; }
     bool is_constant() {return m_constant != NULL;}
     bool is_array_expression() {

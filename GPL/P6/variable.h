@@ -62,6 +62,7 @@ class Variable
     int get_int_value() const;
     double get_double_value() const;
     std::string get_string_value() const;
+    Animation_block *get_animation_block_value() const; // New function for ANIMATION_BLOCK
 
     Gpl_type get_type() const {return m_type;}
 
