@@ -59,10 +59,7 @@ Expression::Expression(Variable *variable)
     m_is_element = variable->is_array();
 }
 
-Expression::Expression(Operator_type op,
-                       Expression *lhs,
-                       Expression *rhs
-                       )
+Expression::Expression(Operator_type op, Expression *lhs, Expression *rhs)
 {
     m_constant = nullptr;
     m_variable = nullptr;
@@ -71,32 +68,51 @@ Expression::Expression(Operator_type op,
     m_lhs = lhs;
     m_rhs = rhs;
 
-    
-  switch (op) {
-      case PLUS:
-      case MINUS:
-      case MULTIPLY:
-      case DIVIDE:
-          m_type = (lhs->m_type == DOUBLE || rhs->m_type == DOUBLE) ? DOUBLE : INT;
-          break;
+    // Type-check and determine the result type
+    switch (op)
+    {
+        case PLUS:
+        case MINUS:
+        case MULTIPLY:
+        case DIVIDE:
+            if ((lhs->m_type != INT && lhs->m_type != DOUBLE) || 
+                (rhs->m_type != INT && rhs->m_type != DOUBLE))
+            {
+                Error::error(Error::INVALID_RIGHT_OPERAND_TYPE, operator_to_string(op), gpl_type_to_string(rhs->m_type));
+                return;           // Stop further processing
+            }
+            m_type = (lhs->m_type == DOUBLE || rhs->m_type == DOUBLE) ? DOUBLE : INT;
+            break;
 
-      case AND:
-      case OR:
-      case EQUAL:
-      case NOT_EQUAL:
-      case LESS_THAN:
-      case LESS_EQUAL:
-      case GREATER_THAN:
-      case GREATER_EQUAL:
-          m_type = INT;
-          break;
+        case AND:
+        case OR:
+        case EQUAL:
+        case NOT_EQUAL:
+        case LESS_THAN:
+        case LESS_EQUAL:
+        case GREATER_THAN:
+        case GREATER_EQUAL:
+            if ((lhs->m_type != INT && lhs->m_type != DOUBLE) || 
+                (rhs->m_type != INT && rhs->m_type != DOUBLE))
+            {
+                Error::error(Error::INVALID_RIGHT_OPERAND_TYPE, operator_to_string(op), gpl_type_to_string(rhs->m_type));
+                return;
+            }
+            m_type = INT;
+            break;
 
-      case MOD:
-          m_type = INT;
-          break;
-      default:
-          assert(false && "Unknown unary operator");
-  }
+        case MOD:
+            if (lhs->m_type != INT || rhs->m_type != INT)
+            {
+                Error::error(Error::INVALID_RIGHT_OPERAND_TYPE, operator_to_string(op), gpl_type_to_string(rhs->m_type));
+                return;
+            }
+            m_type = INT;
+            break;
+
+        default:
+            assert(false && "Unknown operator");
+    }
 }
 
 Expression::Expression(Operator_type op, Expression *operand)
@@ -138,8 +154,6 @@ Expression::Expression(Operator_type op, Expression *operand)
 
 int Expression::eval_int()
 {
-    assert(m_type == INT || m_type == DOUBLE);
-
     if (m_type == DOUBLE)
         return static_cast<int>(eval_double());
 

@@ -126,7 +126,7 @@ Symbol::Symbol(string name, Gpl_type type)
             m_data_void_ptr = (void *) new Pixmap();
             break;
         case ANIMATION_BLOCK:
-            m_data_void_ptr = nullptr; // No object created until explicitly set
+            m_data_void_ptr = (void *) new Animation_block();
             break;
         default:
             assert(0); // Unhandled type
@@ -340,19 +340,22 @@ void Symbol::print(ostream &os) const
     {
         for (int i = 0; i < m_size; i++)
         {
-            os << gpl_type_to_string(get_base_type()) << " " << m_name << "[" << i << "] = ";
             if (is_int())
-                os << get_int_value(i);
+                os << gpl_type_to_string(get_base_type()) << " " << m_name << "[" << i << "] = " << get_int_value(i);
             else if (is_double())
-                os << get_double_value(i);
+                os << gpl_type_to_string(get_base_type()) << " " << m_name << "[" << i << "] = " << get_double_value(i);
             else if (is_string())
-                os << "\"" << get_string_value(i) << "\"";
+                os << gpl_type_to_string(get_base_type()) << " " << m_name << "[" << i << "] = " << get_string_value(i) << "\"";
+            else if (m_type == ANIMATION_BLOCK)
+            {
+            os << "animation_block " << m_name;
+            }
             else if (is_game_object())
             {
                 Game_object* obj = get_game_object_value(i);
                 if (obj)
                 {
-                    obj->print(m_name, os); // Pass the symbol name and output stream
+                    obj->print(m_name + "[" + std::to_string(i) + "]", os); // Adds [index] here
                 }
                 else
                     os << "null";
@@ -370,6 +373,10 @@ void Symbol::print(ostream &os) const
             os << gpl_type_to_string(get_base_type()) << " " << m_name << " = " << get_double_value();
         else if (is_string())
             os << gpl_type_to_string(get_base_type()) << " " << m_name << " = " << "\"" << get_string_value() << "\"";
+        else if (m_type == ANIMATION_BLOCK)
+        {
+        os << "animation_block " << m_name;
+        }
         else if (is_game_object())
         {
             Game_object* obj = get_game_object_value();

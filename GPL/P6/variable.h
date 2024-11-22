@@ -49,6 +49,10 @@ class Variable
     Variable(Symbol *symbol);
     // For arrays.
     Variable(Symbol *symbol, Expression *expression);
+    // Constructor for member variables like rect.x
+    Variable(Symbol *symbol, std::string field);
+    // Constructor for indexed member variables like rects[k].x
+    Variable(Symbol *symbol, Expression *expression, std::string field);
 
     // For placeholder variables.
     Variable();
@@ -62,14 +66,23 @@ class Variable
     int get_int_value() const;
     double get_double_value() const;
     std::string get_string_value() const;
+    // Getters for Game_object and Animation_block
+    Game_object *get_game_object_value() const;
     Animation_block *get_animation_block_value() const; // New function for ANIMATION_BLOCK
 
     Gpl_type get_type() const {return m_type;}
+    // Helper for base game object type
+    Gpl_type get_base_game_object_type() const { return m_base_game_object_type; }
+
 
     bool is_int() const {return m_type & INT;} 
     bool is_double() const {return m_type & DOUBLE;}
     bool is_numeric() const {return m_type & INT || m_type & DOUBLE;}
     bool is_string() const {return m_type & STRING;}
+    // Type checking helpers
+    bool is_game_object() const { return m_type & GAME_OBJECT; }
+    bool is_animation_block() const { return m_type == ANIMATION_BLOCK; }
+    bool is_non_member_animation_block() const { return m_field == nullptr && is_animation_block(); }
     
     // Setter functions. The functions set the value, i.e., m_data_void_ptr,
     // of symbols. Note that m_data_void_ptr is a private member variable meaning that
@@ -92,6 +105,9 @@ class Variable
 
     Symbol *m_symbol = NULL;
     Gpl_type m_type = NO_TYPE;
+
+    Gpl_type m_base_game_object_type = NO_TYPE; // Base type for the game object.
+
     bool m_is_valid;
     int m_size;
     // The variable object sets m_expression pointer to the expression object
@@ -101,6 +117,7 @@ class Variable
     // arra[k+2] : k+2 is an expression.
     // Non-array variable object's m_expressions remains NULL.
     Expression *m_expression = NULL;
+    std::string *m_field = nullptr; // Stores the member variable name (e.g., "x").
 };
 
 

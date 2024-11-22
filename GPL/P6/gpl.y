@@ -39,6 +39,7 @@ string cur_object_under_construction_name;
   Variable         *union_variable;
   Symbol           *symbol;
   Gpl_type         gpl_type;
+  int              simple_type;
   int              math_operator_type;
 }
 
@@ -158,7 +159,7 @@ string cur_object_under_construction_name;
 %left T_MULTIPLY T_DIVIDE T_MOD
 %nonassoc UNARY_OPS
 
-%type <gpl_type> simple_type
+%type <simple_type> simple_type
 %type <gpl_type> object_type
 %type <union_expression> expression
 %type <union_expression> primary_expression
@@ -195,8 +196,10 @@ declaration:
             new_symbol = new Symbol(var_name, 0);
         } else if ($1 == T_DOUBLE) {
             new_symbol = new Symbol(var_name, 0.0);
-        } else {
+        } else if ($1 == T_STRING) {
             new_symbol = new Symbol(var_name, "");
+        } else if ($1 == ANIMATION_BLOCK) {
+            new_symbol = new Symbol(var_name, nullptr); // Default animation_block value
         }
 
         // Attempt to insert the symbol into the symbol table
@@ -206,21 +209,49 @@ declaration:
         } else if ($3) {
             Gpl_type initializer_type = $3->get_type();
 
-            // Check for type mismatches or array issues
-            if (initializer_type == INT_ARRAY || initializer_type == DOUBLE_ARRAY || initializer_type == STRING_ARRAY) {
-                Error::error(Error::VARIABLE_IS_AN_ARRAY, $3->get_variable()->get_name());
-            } else if ($1 == T_INT && initializer_type != INT) {
-                Error::error(Error::INVALID_TYPE_FOR_INITIAL_VALUE, gpl_type_to_string(initializer_type), var_name, "int");
+            // Handle animation_block assignments
+            if (initializer_type == ANIMATION_BLOCK && $1 != ANIMATION_BLOCK) {
+                if ($1 == T_INT) {
+                    Error::error(Error::INVALID_TYPE_FOR_INITIAL_VALUE,
+                                gpl_type_to_string(initializer_type),
+                                var_name,
+                                "int");
+                } else if ($1 == T_DOUBLE) {
+                    Error::error(Error::INVALID_TYPE_FOR_INITIAL_VALUE,
+                                gpl_type_to_string(initializer_type),
+                                var_name,
+                                "double");
+                } else if ($1 == T_STRING) {
+                    Error::error(Error::INVALID_TYPE_FOR_INITIAL_VALUE,
+                                gpl_type_to_string(initializer_type),
+                                var_name,
+                                "string");
+                }
+
+            }
+            // Handle other type mismatches
+            else if ($1 == T_INT && initializer_type != INT) {
+                // Error::error(Error::INVALID_TYPE_FOR_INITIAL_VALUE,
+                //              gpl_type_to_string(initializer_type),
+                //              var_name,
+                //              "int");
             } else if ($1 == T_DOUBLE && initializer_type != DOUBLE && initializer_type != INT) {
-                Error::error(Error::INVALID_TYPE_FOR_INITIAL_VALUE, gpl_type_to_string(initializer_type), var_name, "double");
-            } else if ($1 == T_STRING && initializer_type != STRING && initializer_type != INT && initializer_type != DOUBLE) {
-                Error::error(Error::ASSIGNMENT_TYPE_ERROR, var_name, gpl_type_to_string(initializer_type));
+                // Error::error(Error::INVALID_TYPE_FOR_INITIAL_VALUE,
+                //              gpl_type_to_string(initializer_type),
+                //              var_name,
+                //              "double");
+            } else if ($1 == T_STRING && initializer_type != STRING) {
+                // Error::error(Error::INVALID_TYPE_FOR_INITIAL_VALUE,
+                //              gpl_type_to_string(initializer_type),
+                //              var_name,
+                //              "string");
             } else {
+                // Valid initialization: set the symbol's value
                 if ($1 == T_INT) {
                     new_symbol->set_value($3->eval_int());
                 } else if ($1 == T_DOUBLE) {
                     new_symbol->set_value($3->eval_double());
-                } else {
+                } else if ($1 == T_STRING) {
                     new_symbol->set_value($3->eval_string());
                 }
             }
@@ -265,73 +296,13 @@ declaration:
 //---------------------------------------------------------------------
 variable_declaration:
     simple_type T_ID optional_initializer
-    {
-        std::string var_name = *$2;
-        int type = $1;
-        Variable *new_variable = nullptr;
-
-        if ($3 != nullptr) {
-            // Initialize the variable with the provided initializer
-            if (type == T_INT) {
-                new_variable = new Variable(var_name, $3->eval_int());
-            } else if (type == T_DOUBLE) {
-                new_variable = new Variable(var_name, $3->eval_double());
-            } else if (type == T_STRING) {
-                new_variable = new Variable(var_name, $3->eval_string());
-            }
-        } else {
-            // Default initialization for the variable
-            new_variable = (type == T_INT) ? new Variable(var_name, 0)
-                         : (type == T_DOUBLE) ? new Variable(var_name, 0.0)
-                         : new Variable(var_name, "");
-        }
-
-        // Attempt to insert the variable into the symbol table
-        if (!sym_table->insert(new_variable)) {
-            Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, var_name);
-            delete new_variable;
-            $$ = nullptr;
-        } else {
-            $$ = new_variable;
-        }
-
-        // Clean up
-        delete $2;
-        delete $3;
-    }
-    | simple_type T_ID T_LBRACKET expression T_RBRACKET
-    {
-        std::string array_name = *$2;
-        int array_size = $4->eval_int();
-
-        // Clean up
-        delete $2;
-        delete $4;
-
-        if (array_size < 1) {
-            // Handle invalid array size
-            Error::error(Error::INVALID_ARRAY_SIZE, array_name, std::to_string(array_size));
-            $$ = nullptr;
-        } else {
-            // Create and insert the array variable
-            Variable *new_variable = new Variable(array_name, array_size);
-
-            if (!sym_table->insert(new_variable)) {
-                Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, array_name);
-                delete new_variable;
-                $$ = nullptr;
-            } else {
-                $$ = new_variable;
-            }
-        }
-    }
     ;
 
 //---------------------------------------------------------------------
 simple_type:
-    T_INT { $$ = INT; }
-    | T_DOUBLE { $$ = DOUBLE; }
-    | T_STRING { $$ = STRING; }
+    T_INT { $$ = T_INT; }
+    | T_DOUBLE { $$ = T_DOUBLE; }
+    | T_STRING { $$ = T_STRING; }
     ;
 
 //---------------------------------------------------------------------
@@ -345,57 +316,102 @@ optional_initializer:
         $$ = nullptr;
     }
 
-//---------------------------------------------------------------------
 object_declaration:
-    object_type T_ID 
+    object_type T_ID
     {
-        // create a new object and it's symbol
-        // (Symbol() creates the new object);
+        // Always create the object, even if it won't be inserted into the symbol table
         Symbol *symbol = new Symbol(*$2, $1);
-    
-        if (!sym_table->insert(symbol))
-        {
-        Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, *$2);
-        }
-        // else
-        // {
-        //     // Print a success message if insertion succeeds
-        //     std::cout << "Object added to symbol table: " 
-        //               << symbol->get_name() 
-        //               << " of type " 
-        //               << gpl_type_to_string(symbol->get_type()) 
-        //               << std::endl;
-        // }
 
-        // assign to global variable so the parameters can be inserted into
-        // this object when each parameter is parsed
-        cur_object_under_construction = symbol->get_game_object_value();
-        cur_object_under_construction_name = symbol->get_name();
+        // Check if the variable is already declared
+        if (Symbol_table::instance()->lookup(*$2)) {
+            // Emit error for previously declared variable
+            Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, *$2);
+
+            // Allow parameter parsing for the created object, but it won't be added to the symbol table
+            cur_object_under_construction = symbol->get_game_object_value();
+            cur_object_under_construction_name = symbol->get_name();
+        } else {
+            // Attempt to insert the symbol into the symbol table
+            if (!sym_table->insert(symbol)) {
+                // Fallback error handling (shouldn't reach here)
+                Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, *$2);
+                delete symbol;
+            } else {
+                // Prepare for parameter parsing
+                cur_object_under_construction = symbol->get_game_object_value();
+                cur_object_under_construction_name = symbol->get_name();
+            }
+        }
     }
-    T_LPAREN parameter_list_or_empty T_RPAREN 
+    T_LPAREN parameter_list_or_empty T_RPAREN
     {
-        cur_object_under_construction = NULL;
-        delete $2; // Scanner allocates memory for each T_ID string
+        // Reset the global construction variables after parameter parsing
+        cur_object_under_construction = nullptr;
+        delete $2; // Free memory allocated for T_ID
     }
     | object_type T_ID T_LBRACKET expression T_RBRACKET
     {
-        // Create an array of objects
-        int size = $4->eval_int();
+        // Check if the variable is already declared
+        if (Symbol_table::instance()->lookup(*$2)) {
+            // Emit error for previously declared variable
+            Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, *$2);
 
-        if (size <= 0)
-        {
-            Error::error(Error::INVALID_ARRAY_SIZE, *$2);
-        }
-        else
-        {
-            Symbol *symbol = new Symbol(*$2, $1, size);
+            delete $4;
 
-            if (!sym_table->insert(symbol))
-            {
-                Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, *$2);
+            // Skip further processing
+            cur_object_under_construction = nullptr;
+        } else {
+            // Check the type of the size expression
+            Gpl_type expr_type = $4->get_type();
+
+            if (expr_type != INT) {
+                // Report an error for non-integer array size
+                Error::error(Error::ARRAY_SIZE_MUST_BE_AN_INTEGER,
+                             gpl_type_to_string(expr_type),
+                             *$2);
+
+                // Free memory for T_ID and the expression
+                delete $2;
+                delete $4;
+
+                // Skip further processing
+                cur_object_under_construction = nullptr;
+            } else {
+                // Evaluate the size expression
+                int size = $4->eval_int();
+                delete $4; // Free memory allocated for the expression
+
+                if (size <= 0) {
+                    // Report an error for invalid array size
+                    Error::error(Error::INVALID_ARRAY_SIZE, *$2, std::to_string(size));
+                } else {
+                    // Map object type to array type
+                    Gpl_type array_type;
+                    if ($1 == CIRCLE)
+                        array_type = CIRCLE_ARRAY;
+                    else if ($1 == RECTANGLE)
+                        array_type = RECTANGLE_ARRAY;
+                    else if ($1 == TRIANGLE)
+                        array_type = TRIANGLE_ARRAY;
+                    else if ($1 == TEXTBOX)
+                        array_type = TEXTBOX_ARRAY;
+                    else if ($1 == PIXMAP)
+                        array_type = PIXMAP_ARRAY;
+                    else {
+                        Error::error(Error::ASSIGNMENT_TYPE_ERROR, *$2);
+                    }
+
+                    // Create the array symbol
+                    Symbol *symbol = new Symbol(*$2, array_type, size);
+
+                    if (!sym_table->insert(symbol)) {
+                        Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, *$2);
+                        delete symbol;
+                    }
+                }
+                delete $2; // Free memory allocated for T_ID
             }
         }
-        delete $4; // Free memory allocated for the expression
     }
     ;
 
@@ -430,6 +446,12 @@ parameter:
         Expression *value_expression = $3;
         Gpl_type value_expression_type = value_expression->get_type();
 
+        // Ensure `cur_object_under_construction` is valid
+        if (!cur_object_under_construction) {
+            delete value_expression;
+            return 0;
+        }
+
         // Get the type of the parameter in the game object
         Status status;
         Gpl_type parameter_type;
@@ -437,14 +459,49 @@ parameter:
 
         if (status == OK)
         {
-            // Check for type mismatch and assign the value
-            if (parameter_type != value_expression_type)
+            // Handle assignment of an ANIMATION_BLOCK
+            if (parameter_type == ANIMATION_BLOCK)
+            {
+                if (value_expression_type != ANIMATION_BLOCK) {
+                    // The provided value is not an animation block
+                    Error::error(Error::INVALID_RIGHT_OPERAND_TYPE,
+                                 parameter,
+                                 gpl_type_to_string(value_expression_type));
+                } else {
+                    // Verify type compatibility between object and animation block
+                    Animation_block *block = value_expression->eval_animation_block();
+                    Symbol *parameter_symbol = block->get_parameter_symbol();
+                    if (parameter_symbol->get_type() != cur_object_under_construction->get_type()) {
+                        // Type mismatch
+                        Error::error(Error::TYPE_MISMATCH_BETWEEN_ANIMATION_BLOCK_AND_OBJECT,
+                                     cur_object_under_construction_name,
+                                     block->name());
+                    } else {
+                        // Valid assignment
+                        cur_object_under_construction->set_member_variable(parameter, block);
+                    }
+                }
+            }
+            // Handle implicit conversion for DOUBLE <- INT
+            else if (parameter_type == DOUBLE && value_expression_type == INT)
+            {
+                double converted_value = value_expression->eval_int() * 1.0;
+                cur_object_under_construction->set_member_variable(parameter, converted_value);
+            }
+            // Handle implicit conversion for STRING <- INT or STRING <- DOUBLE
+            else if (parameter_type == STRING &&
+                     (value_expression_type == INT || value_expression_type == DOUBLE))
+            {
+                std::string converted_value = value_expression->eval_string();
+                cur_object_under_construction->set_member_variable(parameter, converted_value);
+            }
+            // Handle mismatched types
+            else if (parameter_type != value_expression_type)
             {
                 Error::error(Error::INCORRECT_CONSTRUCTOR_PARAMETER_TYPE,
-                            cur_object_under_construction_name,
-                            parameter,
-                            gpl_type_to_string(parameter_type));
-
+                             cur_object_under_construction_name,
+                             parameter,
+                             gpl_type_to_string(parameter_type));
             }
             else
             {
@@ -455,25 +512,20 @@ parameter:
                     cur_object_under_construction->set_member_variable(parameter, value_expression->eval_double());
                 else if (parameter_type == STRING)
                     cur_object_under_construction->set_member_variable(parameter, value_expression->eval_string());
-                else if (parameter_type == ANIMATION_BLOCK)
-                {
-                    Animation_block *block = value_expression->eval_animation_block();
-                    cur_object_under_construction->set_member_variable(parameter, block);
-                }
             }
         }
         else
         {
             // Handle unknown parameters
+            std::string base_type_name = gpl_type_to_string(cur_object_under_construction->get_type());
             Error::error(Error::UNKNOWN_CONSTRUCTOR_PARAMETER,
-                         cur_object_under_construction_name,
+                         base_type_name,
                          parameter);
         }
 
         delete value_expression; // Free memory allocated for the expression
     }
     ;
-
 
 //---------------------------------------------------------------------
 forward_declaration:
@@ -488,6 +540,7 @@ forward_declaration:
 
         // Retrieve the Animation_block and initialize it with the parameter
         Animation_block *animation_block = animation_symbol->get_animation_block_value();
+        assert(animation_block != nullptr); // Ensure animation_block is valid
         animation_block->initialize($5, *$3); // Initialize with parameter symbol and name
 
         delete $3; // Clean up
@@ -531,7 +584,7 @@ animation_parameter:
         Symbol *parameter_symbol = new Symbol(*$2, $1);
         if (!sym_table->insert(parameter_symbol))
         {
-            Error::error(Error::PREVIOUSLY_DECLARED_VARIABLE, *$2);
+            Error::error(Error::ANIMATION_PARAMETER_NAME_NOT_UNIQUE, *$2);
         }
         else
         {
@@ -699,6 +752,62 @@ variable:
 
         delete $1;
     }
+    | T_ID T_PERIOD T_ID
+    {
+        Symbol *sym = Symbol_table::instance()->lookup(*$1);
+
+        if (!sym) {
+            // Variable not found
+            Error::error(Error::UNDECLARED_VARIABLE, *$1);
+            $$ = nullptr;
+        } else if (!sym->is_game_object()) {
+            // Variable is not a game object
+            Error::error(Error::LHS_OF_PERIOD_MUST_BE_OBJECT, *$1);
+            $$ = nullptr;
+        } else {
+            // Check if the member variable exists
+            Game_object *game_object = sym->get_game_object_value();
+            assert(game_object != nullptr);
+
+            Gpl_type member_type;
+            if (game_object->get_member_variable_type(*$3, member_type) != OK) {
+                // Member variable does not exist
+                Error::error(Error::UNDECLARED_MEMBER, *$1, *$3);
+                $$ = nullptr;
+            } else {
+                // Member exists, create the variable
+                $$ = new Variable(sym, *$3);
+            }
+        }
+
+        delete $1;
+        delete $3;
+    }
+    | T_ID T_LBRACKET expression T_RBRACKET T_PERIOD T_ID
+    {
+        Symbol *sym = Symbol_table::instance()->lookup(*$1);
+
+        if (!sym) {
+            Error::error(Error::UNDECLARED_VARIABLE, *$1 + "[]");
+            $$ = nullptr;
+        } else {
+            if (!sym->is_array()) {
+                Error::error(Error::VARIABLE_NOT_AN_ARRAY, *$1);
+                $$ = nullptr;
+            } else {
+                int index = $3->eval_int();
+                if (!sym->is_game_object()) {
+                    Error::error(Error::LHS_OF_PERIOD_MUST_BE_OBJECT, *$1);
+                    $$ = nullptr;
+                } else {
+                    $$ = new Variable(sym, $3, *$6); // Member variable like `rects[i].x`
+                }
+            }
+        }
+
+        delete $1;
+        delete $6;
+    }   
     ;
 
 //---------------------------------------------------------------------
