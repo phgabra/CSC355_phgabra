@@ -1,0 +1,12 @@
+// the initialization and increment statements in a for loop can be empty
+int i;
+
+on akey
+{
+  i = 0;
+  for (; i < 10; )
+  {
+    print(i);
+    i++;
+  }
+} 
