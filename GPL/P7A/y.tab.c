@@ -907,19 +907,19 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   189,   189,   194,   195,   200,   275,   305,   306,   316,
-     317,   318,   323,   327,   334,   333,   365,   433,   434,   435,
-     436,   437,   442,   443,   448,   449,   454,   545,   565,   566,
-     571,   572,   573,   574,   579,   584,   592,   597,   619,   624,
-     632,   636,   640,   644,   648,   652,   656,   660,   664,   668,
-     672,   676,   680,   684,   688,   692,   696,   700,   704,   708,
-     712,   716,   720,   724,   732,   736,   744,   752,   761,   769,
-     770,   775,   776,   777,   778,   779,   784,   794,   802,   814,
-     832,   840,   841,   846,   921,   953,   983,   998,  1017,  1033,
-    1060,  1091,  1120,  1124,  1138,  1152,  1158,  1164,  1170,  1176,
-    1182,  1188,  1199,  1213,  1227,  1241,  1255,  1266,  1277,  1294,
-    1298,  1302,  1306,  1310,  1314,  1318,  1326,  1327,  1328,  1329,
-    1330,  1331,  1332,  1333,  1334,  1335,  1339
+       0,   190,   190,   195,   196,   201,   276,   306,   307,   317,
+     318,   319,   324,   328,   335,   334,   366,   434,   435,   436,
+     437,   438,   443,   444,   449,   450,   455,   546,   566,   567,
+     572,   573,   574,   575,   580,   585,   597,   602,   624,   629,
+     642,   646,   650,   654,   658,   662,   666,   670,   674,   678,
+     682,   686,   690,   694,   698,   702,   706,   710,   714,   718,
+     722,   726,   730,   734,   742,   746,   754,   762,   771,   779,
+     780,   785,   786,   787,   788,   789,   794,   804,   818,   846,
+     864,   883,   884,   889,   964,   996,  1026,  1041,  1060,  1076,
+    1103,  1134,  1163,  1167,  1181,  1195,  1201,  1207,  1213,  1219,
+    1225,  1231,  1242,  1256,  1270,  1284,  1298,  1309,  1320,  1337,
+    1341,  1345,  1349,  1353,  1357,  1361,  1369,  1370,  1371,  1372,
+    1373,  1374,  1375,  1376,  1377,  1378,  1382
 };
 #endif
 
@@ -1952,7 +1952,7 @@ yyreduce:
   switch (yyn)
     {
   case 5: /* declaration: simple_type "identifier" optional_initializer  */
-#line 201 "gpl.y"
+#line 202 "gpl.y"
     {
         std::string var_name = *(yyvsp[-1].union_string);
         delete (yyvsp[-1].union_string);
@@ -2031,7 +2031,7 @@ yyreduce:
     break;
 
   case 6: /* declaration: simple_type "identifier" "[" expression "]"  */
-#line 276 "gpl.y"
+#line 277 "gpl.y"
     {
         std::string array_name = *(yyvsp[-3].union_string);
         Gpl_type expr_type = (yyvsp[-1].union_expression)->get_type();
@@ -2065,25 +2065,25 @@ yyreduce:
     break;
 
   case 9: /* simple_type: "int"  */
-#line 316 "gpl.y"
+#line 317 "gpl.y"
           { (yyval.simple_type) = T_INT; }
 #line 2071 "y.tab.c"
     break;
 
   case 10: /* simple_type: "double"  */
-#line 317 "gpl.y"
+#line 318 "gpl.y"
                { (yyval.simple_type) = T_DOUBLE; }
 #line 2077 "y.tab.c"
     break;
 
   case 11: /* simple_type: "string"  */
-#line 318 "gpl.y"
+#line 319 "gpl.y"
                { (yyval.simple_type) = T_STRING; }
 #line 2083 "y.tab.c"
     break;
 
   case 12: /* optional_initializer: "=" expression  */
-#line 324 "gpl.y"
+#line 325 "gpl.y"
     {
         (yyval.union_expression) = (yyvsp[0].union_expression);
     }
@@ -2091,7 +2091,7 @@ yyreduce:
     break;
 
   case 13: /* optional_initializer: empty  */
-#line 328 "gpl.y"
+#line 329 "gpl.y"
     {
         (yyval.union_expression) = nullptr;
     }
@@ -2099,7 +2099,7 @@ yyreduce:
     break;
 
   case 14: /* $@1: %empty  */
-#line 334 "gpl.y"
+#line 335 "gpl.y"
     {
         // Always create the object, even if it won't be inserted into the symbol table
         Symbol *symbol = new Symbol(*(yyvsp[0].union_string), (yyvsp[-1].gpl_type));
@@ -2129,7 +2129,7 @@ yyreduce:
     break;
 
   case 15: /* object_declaration: object_type "identifier" $@1 "(" parameter_list_or_empty ")"  */
-#line 360 "gpl.y"
+#line 361 "gpl.y"
     {
         // Reset the global construction variables after parameter parsing
         cur_object_under_construction = nullptr;
@@ -2139,7 +2139,7 @@ yyreduce:
     break;
 
   case 16: /* object_declaration: object_type "identifier" "[" expression "]"  */
-#line 366 "gpl.y"
+#line 367 "gpl.y"
     {
         // Check if the variable is already declared
         if (Symbol_table::instance()->lookup(*(yyvsp[-3].union_string))) {
@@ -2207,37 +2207,37 @@ yyreduce:
     break;
 
   case 17: /* object_type: "triangle"  */
-#line 433 "gpl.y"
+#line 434 "gpl.y"
                { (yyval.gpl_type) = TRIANGLE; }
 #line 2213 "y.tab.c"
     break;
 
   case 18: /* object_type: "pixmap"  */
-#line 434 "gpl.y"
+#line 435 "gpl.y"
                { (yyval.gpl_type) = PIXMAP; }
 #line 2219 "y.tab.c"
     break;
 
   case 19: /* object_type: "circle"  */
-#line 435 "gpl.y"
+#line 436 "gpl.y"
                { (yyval.gpl_type) = CIRCLE; }
 #line 2225 "y.tab.c"
     break;
 
   case 20: /* object_type: "rectangle"  */
-#line 436 "gpl.y"
+#line 437 "gpl.y"
                   { (yyval.gpl_type) = RECTANGLE; }
 #line 2231 "y.tab.c"
     break;
 
   case 21: /* object_type: "textbox"  */
-#line 437 "gpl.y"
+#line 438 "gpl.y"
                 { (yyval.gpl_type) = TEXTBOX; }
 #line 2237 "y.tab.c"
     break;
 
   case 26: /* parameter: "identifier" "=" expression  */
-#line 455 "gpl.y"
+#line 456 "gpl.y"
     {
         std::string parameter = *(yyvsp[-2].union_string);
         delete (yyvsp[-2].union_string); // Free memory allocated for T_ID
@@ -2328,7 +2328,7 @@ yyreduce:
     break;
 
   case 27: /* forward_declaration: "forward" "animation" "identifier" "(" animation_parameter ")"  */
-#line 546 "gpl.y"
+#line 547 "gpl.y"
     {
         // Create a new Animation_block
         Symbol *animation_symbol = new Symbol(*(yyvsp[-3].union_string), ANIMATION_BLOCK);
@@ -2348,15 +2348,19 @@ yyreduce:
     break;
 
   case 35: /* termination_block: "termination" statement_block  */
-#line 585 "gpl.y"
+#line 586 "gpl.y"
   {
-      // COMPLETE ME
+    //   // Create a termination block object using the parsed statement block
+    //   Statement_block* block = $2; // $2 refers to the parsed statement block
+      
+    //   // Insert the termination block into the current statement block
+    //   statement_block_stack.top()->insert(new Termination_block(block, $1));
   }
-#line 2356 "y.tab.c"
+#line 2360 "y.tab.c"
     break;
 
   case 37: /* animation_parameter: object_type "identifier"  */
-#line 598 "gpl.y"
+#line 603 "gpl.y"
     {
         // Create a new Game_object parameter
         Symbol *parameter_symbol = new Symbol(*(yyvsp[0].union_string), (yyvsp[-1].gpl_type));
@@ -2374,284 +2378,311 @@ yyreduce:
         (yyval.symbol) = parameter_symbol; // Pass the Symbol pointer up the tree
         delete (yyvsp[0].union_string); // Clean up
     }
-#line 2378 "y.tab.c"
+#line 2382 "y.tab.c"
     break;
 
   case 39: /* on_block: "on" keystroke statement_block  */
-#line 625 "gpl.y"
+#line 630 "gpl.y"
   {
-      // COMPLETE ME
+    //   // Create an On_block object using the parsed keystroke and statement block
+    //   Keystroke* key = $2;                // $2 is the parsed keystroke
+    //   Statement_block* block = $3;        // $3 is the parsed statement block
+      
+    //   // Insert the On_block into the current statement block on the stack
+    //   statement_block_stack.top()->insert(new On_block(key, block));
   }
-#line 2386 "y.tab.c"
+#line 2395 "y.tab.c"
     break;
 
   case 40: /* keystroke: "space"  */
-#line 633 "gpl.y"
+#line 643 "gpl.y"
     {
       (yyval.keystroke) = Window::SPACE;
     }
-#line 2394 "y.tab.c"
+#line 2403 "y.tab.c"
     break;
 
   case 41: /* keystroke: "leftarrow"  */
-#line 637 "gpl.y"
+#line 647 "gpl.y"
     {
       (yyval.keystroke) = Window::LEFTARROW;
     }
-#line 2402 "y.tab.c"
+#line 2411 "y.tab.c"
     break;
 
   case 42: /* keystroke: "rightarrow"  */
-#line 641 "gpl.y"
+#line 651 "gpl.y"
     {
       (yyval.keystroke) = Window::RIGHTARROW;
     }
-#line 2410 "y.tab.c"
+#line 2419 "y.tab.c"
     break;
 
   case 43: /* keystroke: "uparrow"  */
-#line 645 "gpl.y"
+#line 655 "gpl.y"
     {
       (yyval.keystroke) = Window::UPARROW;
     }
-#line 2418 "y.tab.c"
+#line 2427 "y.tab.c"
     break;
 
   case 44: /* keystroke: "downarrow"  */
-#line 649 "gpl.y"
+#line 659 "gpl.y"
     {
       (yyval.keystroke) = Window::DOWNARROW;
     }
-#line 2426 "y.tab.c"
+#line 2435 "y.tab.c"
     break;
 
   case 45: /* keystroke: "leftmouse_down"  */
-#line 653 "gpl.y"
+#line 663 "gpl.y"
     {
       (yyval.keystroke) = Window::LEFTMOUSE_DOWN;
     }
-#line 2434 "y.tab.c"
+#line 2443 "y.tab.c"
     break;
 
   case 46: /* keystroke: "middlemouse_down"  */
-#line 657 "gpl.y"
+#line 667 "gpl.y"
     {
       (yyval.keystroke) = Window::MIDDLEMOUSE_DOWN;
     }
-#line 2442 "y.tab.c"
+#line 2451 "y.tab.c"
     break;
 
   case 47: /* keystroke: "rightmouse_down"  */
-#line 661 "gpl.y"
+#line 671 "gpl.y"
     {
       (yyval.keystroke) = Window::RIGHTMOUSE_DOWN;
     }
-#line 2450 "y.tab.c"
+#line 2459 "y.tab.c"
     break;
 
   case 48: /* keystroke: "leftmouse_up"  */
-#line 665 "gpl.y"
+#line 675 "gpl.y"
     {
       (yyval.keystroke) = Window::LEFTMOUSE_UP;
     }
-#line 2458 "y.tab.c"
+#line 2467 "y.tab.c"
     break;
 
   case 49: /* keystroke: "middlemouse_up"  */
-#line 669 "gpl.y"
+#line 679 "gpl.y"
     {
       (yyval.keystroke) = Window::MIDDLEMOUSE_UP;
     }
-#line 2466 "y.tab.c"
+#line 2475 "y.tab.c"
     break;
 
   case 50: /* keystroke: "rightmouse_up"  */
-#line 673 "gpl.y"
+#line 683 "gpl.y"
     {
       (yyval.keystroke) = Window::RIGHTMOUSE_UP;
     }
-#line 2474 "y.tab.c"
+#line 2483 "y.tab.c"
     break;
 
   case 51: /* keystroke: "mouse_move"  */
-#line 677 "gpl.y"
+#line 687 "gpl.y"
     {
       (yyval.keystroke) = Window::MOUSE_MOVE;
     }
-#line 2482 "y.tab.c"
+#line 2491 "y.tab.c"
     break;
 
   case 52: /* keystroke: "mouse_drag"  */
-#line 681 "gpl.y"
+#line 691 "gpl.y"
     {
       (yyval.keystroke) = Window::MOUSE_DRAG;
     }
-#line 2490 "y.tab.c"
+#line 2499 "y.tab.c"
     break;
 
   case 53: /* keystroke: "f1"  */
-#line 685 "gpl.y"
+#line 695 "gpl.y"
     {
       (yyval.keystroke) = Window::F1;
     }
-#line 2498 "y.tab.c"
+#line 2507 "y.tab.c"
     break;
 
   case 54: /* keystroke: "akey"  */
-#line 689 "gpl.y"
+#line 699 "gpl.y"
     {
       (yyval.keystroke) = Window::AKEY;
     }
-#line 2506 "y.tab.c"
+#line 2515 "y.tab.c"
     break;
 
   case 55: /* keystroke: "skey"  */
-#line 693 "gpl.y"
+#line 703 "gpl.y"
     {
       (yyval.keystroke) = Window::SKEY;
     }
-#line 2514 "y.tab.c"
+#line 2523 "y.tab.c"
     break;
 
   case 56: /* keystroke: "dkey"  */
-#line 697 "gpl.y"
+#line 707 "gpl.y"
     {
       (yyval.keystroke) = Window::DKEY;
     }
-#line 2522 "y.tab.c"
+#line 2531 "y.tab.c"
     break;
 
   case 57: /* keystroke: "fkey"  */
-#line 701 "gpl.y"
+#line 711 "gpl.y"
     {
       (yyval.keystroke) = Window::FKEY;
     }
-#line 2530 "y.tab.c"
+#line 2539 "y.tab.c"
     break;
 
   case 58: /* keystroke: "hkey"  */
-#line 705 "gpl.y"
+#line 715 "gpl.y"
     {
       (yyval.keystroke) = Window::HKEY;
     }
-#line 2538 "y.tab.c"
+#line 2547 "y.tab.c"
     break;
 
   case 59: /* keystroke: "jkey"  */
-#line 709 "gpl.y"
+#line 719 "gpl.y"
     {
       (yyval.keystroke) = Window::JKEY;
     }
-#line 2546 "y.tab.c"
+#line 2555 "y.tab.c"
     break;
 
   case 60: /* keystroke: "kkey"  */
-#line 713 "gpl.y"
+#line 723 "gpl.y"
     {
       (yyval.keystroke) = Window::KKEY;
     }
-#line 2554 "y.tab.c"
+#line 2563 "y.tab.c"
     break;
 
   case 61: /* keystroke: "lkey"  */
-#line 717 "gpl.y"
+#line 727 "gpl.y"
     {
       (yyval.keystroke) = Window::LKEY;
     }
-#line 2562 "y.tab.c"
+#line 2571 "y.tab.c"
     break;
 
   case 62: /* keystroke: "wkey"  */
-#line 721 "gpl.y"
+#line 731 "gpl.y"
     {
       (yyval.keystroke) = Window::WKEY;
     }
-#line 2570 "y.tab.c"
+#line 2579 "y.tab.c"
     break;
 
   case 63: /* keystroke: "zkey"  */
-#line 725 "gpl.y"
+#line 735 "gpl.y"
     {
       (yyval.keystroke) = Window::ZKEY;
     }
-#line 2578 "y.tab.c"
+#line 2587 "y.tab.c"
     break;
 
   case 64: /* if_block: statement_block_creator statement end_of_statement_block  */
-#line 733 "gpl.y"
+#line 743 "gpl.y"
   {
       (yyval.statement_block) = (yyvsp[-2].statement_block);
   }
-#line 2586 "y.tab.c"
+#line 2595 "y.tab.c"
     break;
 
   case 65: /* if_block: statement_block  */
-#line 737 "gpl.y"
+#line 747 "gpl.y"
   {
       (yyval.statement_block) = (yyvsp[0].statement_block);
   }
-#line 2594 "y.tab.c"
+#line 2603 "y.tab.c"
     break;
 
   case 66: /* statement_block: "{" statement_block_creator statement_list "}" end_of_statement_block  */
-#line 745 "gpl.y"
+#line 755 "gpl.y"
   {
       (yyval.statement_block) = (yyvsp[-3].statement_block);
   }
-#line 2602 "y.tab.c"
+#line 2611 "y.tab.c"
     break;
 
   case 67: /* statement_block_creator: %empty  */
-#line 752 "gpl.y"
+#line 762 "gpl.y"
   {
       Statement_block *new_block = new Statement_block();
       statement_block_stack.push(new_block);
       (yyval.statement_block) = new_block;
   }
-#line 2612 "y.tab.c"
+#line 2621 "y.tab.c"
     break;
 
   case 68: /* end_of_statement_block: %empty  */
-#line 761 "gpl.y"
+#line 771 "gpl.y"
   {
       assert(!statement_block_stack.empty());
       statement_block_stack.pop();
   }
-#line 2621 "y.tab.c"
+#line 2630 "y.tab.c"
     break;
 
   case 76: /* if_statement: "if" "(" expression ")" if_block  */
-#line 785 "gpl.y"
+#line 795 "gpl.y"
   {
       Expression *expr = (yyvsp[-2].union_expression);
       if (expr->get_type() != INT)
       {
-        Error::error(Error::INVALID_TYPE_FOR_IF_STMT_EXPRESSION);
-        expr = new Expression(0);
+          Error::error(Error::INVALID_TYPE_FOR_IF_STMT_EXPRESSION);
+          expr = new Expression(0);
       }
-      statement_block_stack.top()->insert(new If_statement(expr,(yyvsp[0].statement_block)));
+      statement_block_stack.top()->insert(new If_statement(expr, (yyvsp[0].statement_block))); // If with no else
   }
-#line 2635 "y.tab.c"
+#line 2644 "y.tab.c"
     break;
 
   case 77: /* if_statement: "if" "(" expression ")" if_block "else" if_block  */
-#line 795 "gpl.y"
+#line 805 "gpl.y"
   {
-      // COMPLETE ME
+      Expression *expr = (yyvsp[-4].union_expression);
+      if (expr->get_type() != INT)
+      {
+          Error::error(Error::INVALID_TYPE_FOR_IF_STMT_EXPRESSION);
+          expr = new Expression(0);
+      }
+      statement_block_stack.top()->insert(new If_statement(expr, (yyvsp[-2].statement_block), (yyvsp[0].statement_block))); // If with else
   }
-#line 2643 "y.tab.c"
+#line 2658 "y.tab.c"
     break;
 
   case 78: /* for_statement: "for" "(" statement_block_creator assign_statement_or_empty end_of_statement_block ";" expression ";" statement_block_creator assign_statement_or_empty end_of_statement_block ")" statement_block  */
-#line 807 "gpl.y"
+#line 823 "gpl.y"
   {
-      // COMPLETE ME
+      // Validate and extract components of the for loop
+      Statement_block* initializer_block = (yyvsp[-10].statement_block); // Initializer block
+      Expression* condition = (yyvsp[-6].union_expression);             // Condition expression
+      if (condition->get_type() != INT) {
+          Error::error(Error::INVALID_TYPE_FOR_FOR_STMT_EXPRESSION);
+          condition = new Expression(1); // Default to true condition
+      }
+      Statement_block* incrementor_block = (yyvsp[-4].statement_block); // Incrementor block
+      Statement_block* body_block = (yyvsp[-2].statement_block);      // Body block
+
+      // Create the For_statement object
+      For_statement* for_stmt = new For_statement(
+          initializer_block, condition, incrementor_block, body_block
+      );
+
+      // Insert the for statement into the current statement block
+      statement_block_stack.top()->insert(for_stmt);
   }
-#line 2651 "y.tab.c"
+#line 2682 "y.tab.c"
     break;
 
   case 79: /* print_statement: "print" "(" expression ")"  */
-#line 815 "gpl.y"
+#line 847 "gpl.y"
   {
       Expression *expr = (yyvsp[-1].union_expression);
       if (expr->get_type() != INT
@@ -2665,19 +2696,30 @@ yyreduce:
       }
       statement_block_stack.top()->insert(new Print_statement(expr, (yyvsp[-3].union_int))); // $1 has line_number
   }
-#line 2669 "y.tab.c"
+#line 2700 "y.tab.c"
     break;
 
   case 80: /* exit_statement: "exit" "(" expression ")"  */
-#line 833 "gpl.y"
+#line 865 "gpl.y"
   {
-      // COMPLETE ME
+      // Validate the expression for the exit status
+      Expression* expr = (yyvsp[-1].union_expression); // $3 is the parsed expression
+      if (expr->get_type() != INT) {
+          Error::error(Error::EXIT_STATUS_MUST_BE_AN_INTEGER);
+          expr = new Expression(0); // Default exit status to 0 on error
+      }
+
+      // Create an Exit_statement object
+      Exit_statement* exit_stmt = new Exit_statement(expr, (yyvsp[-3].union_int)); // $1 contains the line number or token info
+
+      // Insert the Exit_statement into the current statement block
+      statement_block_stack.top()->insert(exit_stmt);
   }
-#line 2677 "y.tab.c"
+#line 2719 "y.tab.c"
     break;
 
   case 83: /* assign_statement: variable "=" expression  */
-#line 847 "gpl.y"
+#line 890 "gpl.y"
   {
       Variable *lhs = (yyvsp[-2].union_variable);
       Expression *rhs = (yyvsp[0].union_expression);
@@ -2752,11 +2794,11 @@ yyreduce:
         statement_block_stack.top()->insert(new Assign_statement(ASSIGN, lhs, rhs));
       }
   }
-#line 2756 "y.tab.c"
+#line 2798 "y.tab.c"
     break;
 
   case 84: /* assign_statement: variable "+=" expression  */
-#line 922 "gpl.y"
+#line 965 "gpl.y"
   {
       Gpl_type lhs_type = (yyvsp[-2].union_variable)->get_type();
       Gpl_type rhs_type = (yyvsp[0].union_expression)->get_type();
@@ -2788,11 +2830,11 @@ yyreduce:
         statement_block_stack.top()->insert(new Assign_statement(PLUS_ASSIGN, (yyvsp[-2].union_variable), (yyvsp[0].union_expression)));
       }
   }
-#line 2792 "y.tab.c"
+#line 2834 "y.tab.c"
     break;
 
   case 85: /* assign_statement: variable "-=" expression  */
-#line 954 "gpl.y"
+#line 997 "gpl.y"
   {
       Gpl_type lhs_type = (yyvsp[-2].union_variable)->get_type();
       Gpl_type rhs_type = (yyvsp[0].union_expression)->get_type();
@@ -2822,11 +2864,11 @@ yyreduce:
         statement_block_stack.top()->insert(new Assign_statement(MINUS_ASSIGN, (yyvsp[-2].union_variable), (yyvsp[0].union_expression)));
       }
   }
-#line 2826 "y.tab.c"
+#line 2868 "y.tab.c"
     break;
 
   case 86: /* assign_statement: variable "++"  */
-#line 984 "gpl.y"
+#line 1027 "gpl.y"
   {
       Gpl_type lhs_type = (yyvsp[-1].union_variable)->get_type();
       if (lhs_type != INT)
@@ -2841,11 +2883,11 @@ yyreduce:
         statement_block_stack.top()->insert(new Assign_statement(PLUS_PLUS, (yyvsp[-1].union_variable)));
       }
   }
-#line 2845 "y.tab.c"
+#line 2887 "y.tab.c"
     break;
 
   case 87: /* assign_statement: variable "--"  */
-#line 999 "gpl.y"
+#line 1042 "gpl.y"
   {
       Gpl_type lhs_type = (yyvsp[-1].union_variable)->get_type();
       if (lhs_type != INT)
@@ -2860,11 +2902,11 @@ yyreduce:
         statement_block_stack.top()->insert(new Assign_statement(MINUS_MINUS, (yyvsp[-1].union_variable)));
       }
   }
-#line 2864 "y.tab.c"
+#line 2906 "y.tab.c"
     break;
 
   case 88: /* variable: "identifier"  */
-#line 1018 "gpl.y"
+#line 1061 "gpl.y"
     {
         Symbol *sym = Symbol_table::instance()->lookup(*(yyvsp[0].union_string));
 
@@ -2880,11 +2922,11 @@ yyreduce:
 
         delete (yyvsp[0].union_string);
     }
-#line 2884 "y.tab.c"
+#line 2926 "y.tab.c"
     break;
 
   case 89: /* variable: "identifier" "[" expression "]"  */
-#line 1034 "gpl.y"
+#line 1077 "gpl.y"
     {
         Symbol *sym = Symbol_table::instance()->lookup(*(yyvsp[-3].union_string));
 
@@ -2911,11 +2953,11 @@ yyreduce:
 
         delete (yyvsp[-3].union_string);
     }
-#line 2915 "y.tab.c"
+#line 2957 "y.tab.c"
     break;
 
   case 90: /* variable: "identifier" "." "identifier"  */
-#line 1061 "gpl.y"
+#line 1104 "gpl.y"
     {
         Symbol *sym = Symbol_table::instance()->lookup(*(yyvsp[-2].union_string));
 
@@ -2946,11 +2988,11 @@ yyreduce:
         delete (yyvsp[-2].union_string);
         delete (yyvsp[0].union_string);
     }
-#line 2950 "y.tab.c"
+#line 2992 "y.tab.c"
     break;
 
   case 91: /* variable: "identifier" "[" expression "]" "." "identifier"  */
-#line 1092 "gpl.y"
+#line 1135 "gpl.y"
     {
         Symbol *sym = Symbol_table::instance()->lookup(*(yyvsp[-5].union_string));
 
@@ -2975,19 +3017,19 @@ yyreduce:
         delete (yyvsp[-5].union_string);
         delete (yyvsp[0].union_string);
     }
-#line 2979 "y.tab.c"
+#line 3021 "y.tab.c"
     break;
 
   case 92: /* expression: primary_expression  */
-#line 1121 "gpl.y"
+#line 1164 "gpl.y"
     { 
         (yyval.union_expression) = ((yyvsp[0].union_expression) == nullptr) ? new Expression(0) : (yyvsp[0].union_expression);
     }
-#line 2987 "y.tab.c"
+#line 3029 "y.tab.c"
     break;
 
   case 93: /* expression: expression "||" expression  */
-#line 1125 "gpl.y"
+#line 1168 "gpl.y"
     {
         bool lhs_valid = ((yyvsp[-2].union_expression) != nullptr && (yyvsp[-2].union_expression)->get_type() != STRING);
         bool rhs_valid = ((yyvsp[0].union_expression) != nullptr && (yyvsp[0].union_expression)->get_type() != STRING);
@@ -3001,11 +3043,11 @@ yyreduce:
 
         (yyval.union_expression) = (!lhs_valid || !rhs_valid) ? new Expression(0) : new Expression(OR, (yyvsp[-2].union_expression), (yyvsp[0].union_expression));
     }
-#line 3005 "y.tab.c"
+#line 3047 "y.tab.c"
     break;
 
   case 94: /* expression: expression "&&" expression  */
-#line 1139 "gpl.y"
+#line 1182 "gpl.y"
     {
         bool lhs_valid = ((yyvsp[-2].union_expression) != nullptr && (yyvsp[-2].union_expression)->get_type() != STRING);
         bool rhs_valid = ((yyvsp[0].union_expression) != nullptr && (yyvsp[0].union_expression)->get_type() != STRING);
@@ -3019,71 +3061,71 @@ yyreduce:
 
         (yyval.union_expression) = (!lhs_valid || !rhs_valid) ? new Expression(0) : new Expression(AND, (yyvsp[-2].union_expression), (yyvsp[0].union_expression));
     }
-#line 3023 "y.tab.c"
+#line 3065 "y.tab.c"
     break;
 
   case 95: /* expression: expression "<=" expression  */
-#line 1153 "gpl.y"
+#line 1196 "gpl.y"
     {
         (yyval.union_expression) = ((yyvsp[-2].union_expression) == nullptr || (yyvsp[0].union_expression) == nullptr) 
             ? new Expression(0) 
             : new Expression(LESS_EQUAL, (yyvsp[-2].union_expression), (yyvsp[0].union_expression));
     }
-#line 3033 "y.tab.c"
+#line 3075 "y.tab.c"
     break;
 
   case 96: /* expression: expression ">=" expression  */
-#line 1159 "gpl.y"
+#line 1202 "gpl.y"
     {
         (yyval.union_expression) = ((yyvsp[-2].union_expression) == nullptr || (yyvsp[0].union_expression) == nullptr) 
             ? new Expression(0) 
             : new Expression(GREATER_EQUAL, (yyvsp[-2].union_expression), (yyvsp[0].union_expression));
     }
-#line 3043 "y.tab.c"
+#line 3085 "y.tab.c"
     break;
 
   case 97: /* expression: expression "<" expression  */
-#line 1165 "gpl.y"
+#line 1208 "gpl.y"
     {
         (yyval.union_expression) = ((yyvsp[-2].union_expression) == nullptr || (yyvsp[0].union_expression) == nullptr) 
             ? new Expression(0) 
             : new Expression(LESS_THAN, (yyvsp[-2].union_expression), (yyvsp[0].union_expression));
     }
-#line 3053 "y.tab.c"
+#line 3095 "y.tab.c"
     break;
 
   case 98: /* expression: expression ">" expression  */
-#line 1171 "gpl.y"
+#line 1214 "gpl.y"
     {
         (yyval.union_expression) = ((yyvsp[-2].union_expression) == nullptr || (yyvsp[0].union_expression) == nullptr) 
             ? new Expression(0) 
             : new Expression(GREATER_THAN, (yyvsp[-2].union_expression), (yyvsp[0].union_expression));
     }
-#line 3063 "y.tab.c"
+#line 3105 "y.tab.c"
     break;
 
   case 99: /* expression: expression "==" expression  */
-#line 1177 "gpl.y"
+#line 1220 "gpl.y"
     {
         (yyval.union_expression) = ((yyvsp[-2].union_expression) == nullptr || (yyvsp[0].union_expression) == nullptr) 
             ? new Expression(0) 
             : new Expression(EQUAL, (yyvsp[-2].union_expression), (yyvsp[0].union_expression));
     }
-#line 3073 "y.tab.c"
+#line 3115 "y.tab.c"
     break;
 
   case 100: /* expression: expression "!=" expression  */
-#line 1183 "gpl.y"
+#line 1226 "gpl.y"
     {
         (yyval.union_expression) = ((yyvsp[-2].union_expression) == nullptr || (yyvsp[0].union_expression) == nullptr) 
             ? new Expression(0) 
             : new Expression(NOT_EQUAL, (yyvsp[-2].union_expression), (yyvsp[0].union_expression));
     }
-#line 3083 "y.tab.c"
+#line 3125 "y.tab.c"
     break;
 
   case 101: /* expression: expression "+" expression  */
-#line 1189 "gpl.y"
+#line 1232 "gpl.y"
     {
         if ((yyvsp[-2].union_expression) == nullptr || (yyvsp[0].union_expression) == nullptr) {
             (yyval.union_expression) = new Expression(0);
@@ -3094,11 +3136,11 @@ yyreduce:
             (yyval.union_expression) = new Expression(PLUS, (yyvsp[-2].union_expression), (yyvsp[0].union_expression));
         }
     }
-#line 3098 "y.tab.c"
+#line 3140 "y.tab.c"
     break;
 
   case 102: /* expression: expression "-" expression  */
-#line 1200 "gpl.y"
+#line 1243 "gpl.y"
     {
         bool lhs_valid = ((yyvsp[-2].union_expression) != nullptr && (yyvsp[-2].union_expression)->get_type() != STRING);
         bool rhs_valid = ((yyvsp[0].union_expression) != nullptr && (yyvsp[0].union_expression)->get_type() != STRING);
@@ -3112,11 +3154,11 @@ yyreduce:
 
         (yyval.union_expression) = (!lhs_valid || !rhs_valid) ? new Expression(0) : new Expression(MINUS, (yyvsp[-2].union_expression), (yyvsp[0].union_expression));
     }
-#line 3116 "y.tab.c"
+#line 3158 "y.tab.c"
     break;
 
   case 103: /* expression: expression "*" expression  */
-#line 1214 "gpl.y"
+#line 1257 "gpl.y"
     {
         bool lhs_valid = ((yyvsp[-2].union_expression) != nullptr && (yyvsp[-2].union_expression)->get_type() != STRING);
         bool rhs_valid = ((yyvsp[0].union_expression) != nullptr && (yyvsp[0].union_expression)->get_type() != STRING);
@@ -3130,11 +3172,11 @@ yyreduce:
 
         (yyval.union_expression) = (!lhs_valid || !rhs_valid) ? new Expression(0) : new Expression(MULTIPLY, (yyvsp[-2].union_expression), (yyvsp[0].union_expression));
     }
-#line 3134 "y.tab.c"
+#line 3176 "y.tab.c"
     break;
 
   case 104: /* expression: expression "/" expression  */
-#line 1228 "gpl.y"
+#line 1271 "gpl.y"
     {
         bool lhs_valid = ((yyvsp[-2].union_expression) != nullptr && (yyvsp[-2].union_expression)->get_type() != STRING);
         bool rhs_valid = ((yyvsp[0].union_expression) != nullptr && (yyvsp[0].union_expression)->get_type() != STRING);
@@ -3148,11 +3190,11 @@ yyreduce:
 
         (yyval.union_expression) = (!lhs_valid || !rhs_valid) ? new Expression(0) : new Expression(DIVIDE, (yyvsp[-2].union_expression), (yyvsp[0].union_expression));
     }
-#line 3152 "y.tab.c"
+#line 3194 "y.tab.c"
     break;
 
   case 105: /* expression: expression "%" expression  */
-#line 1242 "gpl.y"
+#line 1285 "gpl.y"
     {
         bool lhs_valid = ((yyvsp[-2].union_expression) != nullptr && (yyvsp[-2].union_expression)->get_type() == INT);
         bool rhs_valid = ((yyvsp[0].union_expression) != nullptr && (yyvsp[0].union_expression)->get_type() == INT);
@@ -3166,11 +3208,11 @@ yyreduce:
 
         (yyval.union_expression) = (!lhs_valid || !rhs_valid) ? new Expression(0) : new Expression(MOD, (yyvsp[-2].union_expression), (yyvsp[0].union_expression));
     }
-#line 3170 "y.tab.c"
+#line 3212 "y.tab.c"
     break;
 
   case 106: /* expression: "-" expression  */
-#line 1256 "gpl.y"
+#line 1299 "gpl.y"
     {
         if ((yyvsp[0].union_expression) == nullptr) {
             (yyval.union_expression) = new Expression(0);
@@ -3181,11 +3223,11 @@ yyreduce:
             (yyval.union_expression) = new Expression(UNARY_MINUS, (yyvsp[0].union_expression));
         }
     }
-#line 3185 "y.tab.c"
+#line 3227 "y.tab.c"
     break;
 
   case 107: /* expression: "!" expression  */
-#line 1267 "gpl.y"
+#line 1310 "gpl.y"
     {
         if ((yyvsp[0].union_expression) == nullptr) {
             (yyval.union_expression) = new Expression(0);
@@ -3196,11 +3238,11 @@ yyreduce:
             (yyval.union_expression) = new Expression(NOT, (yyvsp[0].union_expression));
         }
     }
-#line 3200 "y.tab.c"
+#line 3242 "y.tab.c"
     break;
 
   case 108: /* expression: math_operator "(" expression ")"  */
-#line 1278 "gpl.y"
+#line 1321 "gpl.y"
     {
         if ((yyvsp[-1].union_expression) == nullptr) {
             (yyval.union_expression) = new Expression(0);
@@ -3213,127 +3255,127 @@ yyreduce:
             (yyval.union_expression) = new Expression(static_cast<Operator_type>((yyvsp[-3].math_operator_type)), (yyvsp[-1].union_expression));
         }
     }
-#line 3217 "y.tab.c"
+#line 3259 "y.tab.c"
     break;
 
   case 109: /* primary_expression: "(" expression ")"  */
-#line 1295 "gpl.y"
+#line 1338 "gpl.y"
     { 
         (yyval.union_expression) = ((yyvsp[-1].union_expression) == nullptr) ? new Expression(0) : (yyvsp[-1].union_expression);
     }
-#line 3225 "y.tab.c"
+#line 3267 "y.tab.c"
     break;
 
   case 110: /* primary_expression: variable  */
-#line 1299 "gpl.y"
+#line 1342 "gpl.y"
     { 
         (yyval.union_expression) = ((yyvsp[0].union_variable) == nullptr) ? new Expression(0) : new Expression((yyvsp[0].union_variable));
     }
-#line 3233 "y.tab.c"
+#line 3275 "y.tab.c"
     break;
 
   case 111: /* primary_expression: "int constant"  */
-#line 1303 "gpl.y"
+#line 1346 "gpl.y"
     { 
         (yyval.union_expression) = new Expression((yyvsp[0].union_int)); 
     }
-#line 3241 "y.tab.c"
+#line 3283 "y.tab.c"
     break;
 
   case 112: /* primary_expression: "true"  */
-#line 1307 "gpl.y"
+#line 1350 "gpl.y"
     { 
         (yyval.union_expression) = new Expression(1); 
     }
-#line 3249 "y.tab.c"
-    break;
-
-  case 113: /* primary_expression: "false"  */
-#line 1311 "gpl.y"
-    { 
-        (yyval.union_expression) = new Expression(0); 
-    }
-#line 3257 "y.tab.c"
-    break;
-
-  case 114: /* primary_expression: "double constant"  */
-#line 1315 "gpl.y"
-    { 
-        (yyval.union_expression) = new Expression((yyvsp[0].union_double)); 
-    }
-#line 3265 "y.tab.c"
-    break;
-
-  case 115: /* primary_expression: "string constant"  */
-#line 1319 "gpl.y"
-    { 
-        (yyval.union_expression) = new Expression((yyvsp[0].union_string)); 
-    }
-#line 3273 "y.tab.c"
-    break;
-
-  case 116: /* math_operator: "sin"  */
-#line 1326 "gpl.y"
-          { (yyval.math_operator_type) = SIN; }
-#line 3279 "y.tab.c"
-    break;
-
-  case 117: /* math_operator: "cos"  */
-#line 1327 "gpl.y"
-            { (yyval.math_operator_type) = COS; }
-#line 3285 "y.tab.c"
-    break;
-
-  case 118: /* math_operator: "tan"  */
-#line 1328 "gpl.y"
-            { (yyval.math_operator_type) = TAN; }
 #line 3291 "y.tab.c"
     break;
 
-  case 119: /* math_operator: "asin"  */
-#line 1329 "gpl.y"
-             { (yyval.math_operator_type) = ASIN; }
-#line 3297 "y.tab.c"
+  case 113: /* primary_expression: "false"  */
+#line 1354 "gpl.y"
+    { 
+        (yyval.union_expression) = new Expression(0); 
+    }
+#line 3299 "y.tab.c"
     break;
 
-  case 120: /* math_operator: "acos"  */
-#line 1330 "gpl.y"
-             { (yyval.math_operator_type) = ACOS; }
-#line 3303 "y.tab.c"
+  case 114: /* primary_expression: "double constant"  */
+#line 1358 "gpl.y"
+    { 
+        (yyval.union_expression) = new Expression((yyvsp[0].union_double)); 
+    }
+#line 3307 "y.tab.c"
     break;
 
-  case 121: /* math_operator: "atan"  */
-#line 1331 "gpl.y"
-             { (yyval.math_operator_type) = ATAN; }
-#line 3309 "y.tab.c"
-    break;
-
-  case 122: /* math_operator: "sqrt"  */
-#line 1332 "gpl.y"
-             { (yyval.math_operator_type) = SQRT; }
+  case 115: /* primary_expression: "string constant"  */
+#line 1362 "gpl.y"
+    { 
+        (yyval.union_expression) = new Expression((yyvsp[0].union_string)); 
+    }
 #line 3315 "y.tab.c"
     break;
 
-  case 123: /* math_operator: "floor"  */
-#line 1333 "gpl.y"
-              { (yyval.math_operator_type) = FLOOR; }
+  case 116: /* math_operator: "sin"  */
+#line 1369 "gpl.y"
+          { (yyval.math_operator_type) = SIN; }
 #line 3321 "y.tab.c"
     break;
 
-  case 124: /* math_operator: "abs"  */
-#line 1334 "gpl.y"
-            { (yyval.math_operator_type) = ABS; }
+  case 117: /* math_operator: "cos"  */
+#line 1370 "gpl.y"
+            { (yyval.math_operator_type) = COS; }
 #line 3327 "y.tab.c"
     break;
 
-  case 125: /* math_operator: "random"  */
-#line 1335 "gpl.y"
-               { (yyval.math_operator_type) = RANDOM; }
+  case 118: /* math_operator: "tan"  */
+#line 1371 "gpl.y"
+            { (yyval.math_operator_type) = TAN; }
 #line 3333 "y.tab.c"
     break;
 
+  case 119: /* math_operator: "asin"  */
+#line 1372 "gpl.y"
+             { (yyval.math_operator_type) = ASIN; }
+#line 3339 "y.tab.c"
+    break;
 
-#line 3337 "y.tab.c"
+  case 120: /* math_operator: "acos"  */
+#line 1373 "gpl.y"
+             { (yyval.math_operator_type) = ACOS; }
+#line 3345 "y.tab.c"
+    break;
+
+  case 121: /* math_operator: "atan"  */
+#line 1374 "gpl.y"
+             { (yyval.math_operator_type) = ATAN; }
+#line 3351 "y.tab.c"
+    break;
+
+  case 122: /* math_operator: "sqrt"  */
+#line 1375 "gpl.y"
+             { (yyval.math_operator_type) = SQRT; }
+#line 3357 "y.tab.c"
+    break;
+
+  case 123: /* math_operator: "floor"  */
+#line 1376 "gpl.y"
+              { (yyval.math_operator_type) = FLOOR; }
+#line 3363 "y.tab.c"
+    break;
+
+  case 124: /* math_operator: "abs"  */
+#line 1377 "gpl.y"
+            { (yyval.math_operator_type) = ABS; }
+#line 3369 "y.tab.c"
+    break;
+
+  case 125: /* math_operator: "random"  */
+#line 1378 "gpl.y"
+               { (yyval.math_operator_type) = RANDOM; }
+#line 3375 "y.tab.c"
+    break;
+
+
+#line 3379 "y.tab.c"
 
       default: break;
     }

@@ -200,7 +200,7 @@ Terminals, with rules where they appear
     "termination" (268) 34
     "true" (269) 111
     "false" (270) 112
-    "on" (271) 38
+    "on" <union_int> (271) 38
     "space" (272) 39
     "leftarrow" (273) 40
     "rightarrow" (274) 41
@@ -356,7 +356,7 @@ Nonterminals, with rules where they appear
     statement_block_creator <statement_block> (118)
         on left: 66
         on right: 63 65 77
-    end_of_statement_block (119)
+    end_of_statement_block <statement_block> (119)
         on left: 67
         on right: 35 63 65 77
     statement_list (120)

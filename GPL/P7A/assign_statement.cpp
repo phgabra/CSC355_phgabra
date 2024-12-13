@@ -156,7 +156,7 @@ Assign_statement::execute()
     {
       assert(rhs_type==ANIMATION_BLOCK);
       assert(m_operator == ASSIGN);
-      m_lhs->set(m_rhs->eval_animation_block()->to_int());
+      m_lhs->set(m_rhs->eval_animation_block());
     }
     else assert(0);
   }

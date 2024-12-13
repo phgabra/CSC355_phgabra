@@ -1,0 +1,1 @@
+assertion "(index == UNDEFINED_INDEX && m_size == UNDEFINED_SIZE) || (index >= 0 && m_size >= 1 && index < m_size)" failed: file "symbol.cpp", line 208.  Input line 8.

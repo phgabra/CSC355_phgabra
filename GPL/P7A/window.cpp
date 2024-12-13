@@ -153,12 +153,12 @@ void update_mouse_x_y_in_symbol_table(int x, int y)
   #ifdef P7A
     Symbol *symbol = symbol_table->lookup("mouse_x");
     if (symbol != NULL && symbol->get_type() == INT)
-      symbol->set(x);
+      symbol->set_value(x);
   
     symbol = symbol_table->lookup("mouse_y");
     if (symbol != NULL && symbol->get_type() == INT)
       // GLUT origin is top left, gpl origin is bottom left
-      symbol->set(window->height() - y);
+      symbol->set_value(window->height() - y);
   #endif
 }
 
@@ -317,7 +317,7 @@ void Window::set_width(int width)
     // if there is an INT symbol window_width, update it
     Symbol *symbol = symbol_table->lookup("window_width");
     if (symbol != NULL && symbol->get_type() == INT)
-      symbol->set(width);
+      symbol->set_value(width);
   #endif
 }
 
@@ -329,7 +329,7 @@ void Window::set_height(int height)
     // if there is an INT symbol window_height, update it
     Symbol *symbol = symbol_table->lookup("window_height");
     if (symbol != NULL && symbol->get_type() == INT)
-      symbol->set(height);
+      symbol->set_value(height);
   #endif
 }
 

@@ -64,12 +64,12 @@ std::stack<Statement_block*> statement_block_stack;
 %token T_TEXTBOX             "textbox"
 %token <union_int> T_FORWARD "forward" // value is line number
 %token T_INITIALIZATION      "initialization" 
-%token T_TERMINATION         "termination" 
+%token  T_TERMINATION        "termination"
 
 %token T_TRUE                "true"
 %token T_FALSE               "false"
 
-%token T_ON                  "on"
+%token <union_int> T_ON      "on" // value is line number
 %token T_SPACE               "space"
 %token T_LEFTARROW           "leftarrow"
 %token T_RIGHTARROW          "rightarrow"
@@ -102,7 +102,7 @@ std::stack<Statement_block*> statement_block_stack;
 
 %token T_IF                  "if"
 %token T_FOR                 "for"
-%token T_ELSE                "else"
+%token T_ELSE                "else" // value is line number
 %token <union_int> T_PRINT   "print" // value is line number
 %token <union_int> T_EXIT    "exit" // value is line number
 
@@ -181,6 +181,7 @@ std::stack<Statement_block*> statement_block_stack;
 %type <statement_block> if_block
 %type <statement_block> statement_block
 %type <statement_block> statement_block_creator
+%type <statement_block> end_of_statement_block
 
 %%
 
@@ -583,7 +584,11 @@ initialization_block:
 termination_block:
   T_TERMINATION statement_block
   {
-      // COMPLETE ME
+    //   // Create a termination block object using the parsed statement block
+    //   Statement_block* block = $2; // $2 refers to the parsed statement block
+      
+    //   // Insert the termination block into the current statement block
+    //   statement_block_stack.top()->insert(new Termination_block(block, $1));
   }
   ;
 
@@ -623,7 +628,12 @@ check_animation_parameter:
 on_block:
   T_ON keystroke statement_block
   {
-      // COMPLETE ME
+    //   // Create an On_block object using the parsed keystroke and statement block
+    //   Keystroke* key = $2;                // $2 is the parsed keystroke
+    //   Statement_block* block = $3;        // $3 is the parsed statement block
+      
+    //   // Insert the On_block into the current statement block on the stack
+    //   statement_block_stack.top()->insert(new On_block(key, block));
   }
   ;
 
@@ -786,14 +796,20 @@ if_statement:
       Expression *expr = $3;
       if (expr->get_type() != INT)
       {
-        Error::error(Error::INVALID_TYPE_FOR_IF_STMT_EXPRESSION);
-        expr = new Expression(0);
+          Error::error(Error::INVALID_TYPE_FOR_IF_STMT_EXPRESSION);
+          expr = new Expression(0);
       }
-      statement_block_stack.top()->insert(new If_statement(expr,$5));
+      statement_block_stack.top()->insert(new If_statement(expr, $5)); // If with no else
   }
   | T_IF T_LPAREN expression T_RPAREN if_block T_ELSE if_block
   {
-      // COMPLETE ME
+      Expression *expr = $3;
+      if (expr->get_type() != INT)
+      {
+          Error::error(Error::INVALID_TYPE_FOR_IF_STMT_EXPRESSION);
+          expr = new Expression(0);
+      }
+      statement_block_stack.top()->insert(new If_statement(expr, $5, $7)); // If with else
   }
   ;
 
@@ -805,7 +821,23 @@ for_statement:
     statement_block_creator assign_statement_or_empty end_of_statement_block
     T_RPAREN statement_block
   {
-      // COMPLETE ME
+      // Validate and extract components of the for loop
+      Statement_block* initializer_block = $3; // Initializer block
+      Expression* condition = $7;             // Condition expression
+      if (condition->get_type() != INT) {
+          Error::error(Error::INVALID_TYPE_FOR_FOR_STMT_EXPRESSION);
+          condition = new Expression(1); // Default to true condition
+      }
+      Statement_block* incrementor_block = $9; // Incrementor block
+      Statement_block* body_block = $11;      // Body block
+
+      // Create the For_statement object
+      For_statement* for_stmt = new For_statement(
+          initializer_block, condition, incrementor_block, body_block
+      );
+
+      // Insert the for statement into the current statement block
+      statement_block_stack.top()->insert(for_stmt);
   }
   ;
 
@@ -831,7 +863,18 @@ print_statement:
 exit_statement:
   T_EXIT T_LPAREN expression T_RPAREN
   {
-      // COMPLETE ME
+      // Validate the expression for the exit status
+      Expression* expr = $3; // $3 is the parsed expression
+      if (expr->get_type() != INT) {
+          Error::error(Error::EXIT_STATUS_MUST_BE_AN_INTEGER);
+          expr = new Expression(0); // Default exit status to 0 on error
+      }
+
+      // Create an Exit_statement object
+      Exit_statement* exit_stmt = new Exit_statement(expr, $1); // $1 contains the line number or token info
+
+      // Insert the Exit_statement into the current statement block
+      statement_block_stack.top()->insert(exit_stmt);
   }
   ;
 

@@ -333,6 +333,14 @@ void Symbol::set_value(int index, const string& value) {
     ((std::string*)m_data_void_ptr)[index] = value;
 }
 
+void Symbol::set_value(int index, Animation_block* value) {
+    assert((m_type == ANIMATION_BLOCK) && m_data_void_ptr != nullptr);
+    assert(index_within_range(index));
+
+    // Cast m_data_void_ptr to the appropriate type and assign the value
+    ((Animation_block**)m_data_void_ptr)[index] = value;
+}
+
 void Symbol::print(ostream &os) const
 {
     // If it's an array, iterate through elements and print them

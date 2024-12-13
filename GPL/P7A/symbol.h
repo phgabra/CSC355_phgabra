@@ -62,6 +62,7 @@ class Symbol
     void set_value(int value);
     void set_value(double value);
     void set_value(const std::string& value);
+    void set_value(int index, Animation_block* value); // New overload
     void validate_type_and_index(Gpl_type type, int index) const;
     int get_int_value(int index = UNDEFINED_INDEX) const;
     double get_double_value(int index = UNDEFINED_INDEX) const;

@@ -238,6 +238,19 @@ void Variable::set(string value)
     }
 }
 
+void Variable::set(Animation_block* value)
+{
+    if (m_expression)
+    {
+        int index = eval_index_with_error_checking();
+        m_symbol->set_value(index, value);
+    }
+    else
+    {
+        m_symbol->set_value(0, value);
+    }
+}
+
 // Evaluate expression if there is one, return index if index is out of bounds, 
 // issue error, return 0 (0 is always in bounds)
 int Variable::eval_index_with_error_checking() const
