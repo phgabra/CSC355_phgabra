@@ -316,6 +316,7 @@ optional_initializer:
         $$ = nullptr;
     }
 
+//---------------------------------------------------------------------
 object_declaration:
     object_type T_ID
     {

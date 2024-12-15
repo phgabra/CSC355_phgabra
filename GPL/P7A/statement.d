@@ -1,1 +1,0 @@
-statement.o: statement.cpp
